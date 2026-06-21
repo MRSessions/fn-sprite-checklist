@@ -100,10 +100,12 @@
       aspect-ratio: 1 / 1;
       transform: translate(-50%, -50%);
       margin: 0;
+      padding: 0;
       appearance: none;
       -webkit-appearance: none;
       cursor: pointer;
       border: 4px solid transparent;
+      border-radius: 0;
       background: transparent;
       outline: none;
       transition: transform .12s ease, background .12s ease, border-color .12s ease, box-shadow .12s ease;
@@ -113,12 +115,12 @@
       box-shadow: 0 0 0 4px rgba(0,215,223,.35);
       background: rgba(0,215,223,.12);
     }
-    .sprite-check:checked {
+    .sprite-check.is-found {
       background: rgba(80,255,125,.86);
       border-color: #041007;
       box-shadow: 0 0 0 4px rgba(80,255,125,.22), inset 0 0 0 2px rgba(255,255,255,.45);
     }
-    .sprite-check:checked::after {
+    .sprite-check.is-found::after {
       content: "✓";
       position: absolute;
       inset: -12% 0 0 0;
@@ -130,7 +132,74 @@
       line-height: 1;
       text-shadow: 0 1px 0 rgba(255,255,255,.35);
     }
+    .sprite-check.is-mastered {
+      background: rgba(255,228,93,.94);
+      border-color: #120d02;
+      box-shadow: 0 0 0 4px rgba(255,228,93,.26), inset 0 0 0 2px rgba(255,255,255,.48);
+    }
+    .sprite-check.is-mastered::after {
+      content: "♛";
+      position: absolute;
+      inset: -11% 0 0 0;
+      display: grid;
+      place-items: center;
+      color: #221700;
+      font-size: clamp(16px, 3.8vw, 31px);
+      font-weight: 1000;
+      line-height: 1;
+      text-shadow: 0 1px 0 rgba(255,255,255,.42);
+    }
     .sprite-check:focus-visible { box-shadow: 0 0 0 5px var(--yellow); }
+    .key {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 14px;
+      align-items: center;
+      padding: 10px 14px;
+      background: var(--panel);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 16px;
+      color: #dffcff;
+      font-size: 13px;
+      font-weight: 800;
+    }
+    .key-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      min-height: 26px;
+    }
+    .key-mark {
+      position: relative;
+      display: inline-grid;
+      place-items: center;
+      width: 22px;
+      height: 22px;
+      border: 3px solid rgba(255,255,255,.32);
+      background: transparent;
+    }
+    .key-mark.is-found {
+      background: rgba(80,255,125,.86);
+      border-color: #041007;
+      color: #061018;
+    }
+    .key-mark.is-mastered {
+      background: rgba(255,228,93,.94);
+      border-color: #120d02;
+      color: #221700;
+    }
+    .key-mark.is-found::after {
+      content: "✓";
+      font-size: 19px;
+      font-weight: 1000;
+      line-height: 1;
+    }
+    .key-mark.is-mastered::after {
+      content: "♛";
+      font-size: 18px;
+      font-weight: 1000;
+      line-height: 1;
+    }
     .progress {
       display: flex;
       gap: 10px;
@@ -148,7 +217,7 @@
       background: rgba(255,255,255,.13);
     }
     .fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--cyan), var(--green)); transition: width .18s ease; }
-    .count { min-width: 92px; text-align: right; font-weight: 900; color: #dffcff; }
+    .count { min-width: 176px; text-align: right; font-weight: 900; color: #dffcff; white-space: nowrap; }
     .hint {
       margin: 0;
       color: #b9d5e8;
@@ -230,6 +299,12 @@
       <div id="count" class="count">0 / 41</div>
     </section>
 
+    <section class="key" aria-label="Checklist key">
+      <div class="key-item"><span class="key-mark" aria-hidden="true"></span><span>Not Found</span></div>
+      <div class="key-item"><span class="key-mark is-found" aria-hidden="true"></span><span>Found</span></div>
+      <div class="key-item"><span class="key-mark is-mastered" aria-hidden="true"></span><span>Mastered</span></div>
+    </section>
+
     <section class="stage-wrap">
       <div id="stage" class="stage" aria-label="Sprite checklist image with interactive checkboxes">
         <img src="img_25ef196383a7.png" alt="Fortnite Sprite Checklist" />
@@ -260,6 +335,12 @@
     const SAVE_NAME = "fortnite-sprite-checklist-save.json";
     const LS_KEY = "fortnite-sprite-checklist:v1";
     const FALLBACK_TRACKER_TARGET = "sprites.doomedgaming.com";
+    const STATES = ["not-found", "found", "mastered"];
+    const STATE_LABELS = {
+      "not-found": "Not Found",
+      found: "Found",
+      mastered: "Mastered"
+    };
 
     const groups = [
       ["Water Sprites", ["cyan", "gold", "pink", "purple"], [[125,198],[187,198],[250,198],[310,198]]],
@@ -319,41 +400,67 @@
     for (const [groupName, colors, coords] of groups) {
       coords.forEach(([x, y], i) => {
         const id = `${slug(groupName)}-${colors[i] || i + 1}`;
-        const input = document.createElement("input");
-        input.type = "checkbox";
+        const input = document.createElement("button");
+        input.type = "button";
         input.className = "sprite-check";
         input.id = id;
         input.dataset.group = groupName;
         input.dataset.color = colors[i] || "sprite";
-        input.title = `${groupName} — ${colors[i] || "sprite"}`;
-        input.setAttribute("aria-label", input.title);
+        input.dataset.state = "not-found";
         input.style.left = `${(x / 778) * 100}%`;
         input.style.top = `${(y / 972) * 100}%`;
-        input.addEventListener("change", () => { updateProgress(); scheduleSave(); });
+        updateSpriteState(input, "not-found");
+        input.addEventListener("click", () => {
+          const currentIndex = STATES.indexOf(input.dataset.state);
+          const nextState = STATES[(currentIndex + 1) % STATES.length];
+          updateSpriteState(input, nextState);
+          updateProgress();
+          scheduleSave();
+        });
         stage.appendChild(input);
         checks.push(input);
       });
     }
 
+    function normalizeState(value) {
+      if (value === true) return "found";
+      if (STATES.includes(value)) return value;
+      return "not-found";
+    }
+
+    function updateSpriteState(input, state) {
+      const normalized = normalizeState(state);
+      const spriteName = `${input.dataset.group} — ${input.dataset.color || "sprite"}`;
+      input.dataset.state = normalized;
+      input.classList.toggle("is-found", normalized === "found");
+      input.classList.toggle("is-mastered", normalized === "mastered");
+      input.title = `${spriteName}: ${STATE_LABELS[normalized]}`;
+      input.setAttribute("aria-label", input.title);
+      input.setAttribute("aria-pressed", normalized === "not-found" ? "false" : "true");
+    }
+
     function currentData() {
       return {
-        version: 1,
+        version: 2,
         savedAt: new Date().toISOString(),
         total: checks.length,
-        checked: Object.fromEntries(checks.map(c => [c.id, c.checked]))
+        states: Object.fromEntries(checks.map(c => [c.id, c.dataset.state])),
+        checked: Object.fromEntries(checks.map(c => [c.id, c.dataset.state !== "not-found"]))
       };
     }
 
     function applyData(data) {
+      const states = data && data.states ? data.states : null;
       const checked = data && data.checked ? data.checked : data || {};
-      checks.forEach(c => { c.checked = !!checked[c.id]; });
+      checks.forEach(c => updateSpriteState(c, states ? states[c.id] : checked[c.id]));
       updateProgress();
     }
 
     function updateProgress() {
-      const done = checks.filter(c => c.checked).length;
+      const done = checks.filter(c => c.dataset.state !== "not-found").length;
+      const mastered = checks.filter(c => c.dataset.state === "mastered").length;
       const total = checks.length;
-      countEl.textContent = `${done} / ${total}`;
+      countEl.textContent = mastered > 0 ? `${done} / ${total} · ${mastered} mastered` : `${done} / ${total}`;
       fillEl.style.width = `${Math.round((done / total) * 100)}%`;
     }
 
@@ -463,7 +570,7 @@
 
     onOptional("resetAll", "click", async () => {
       if (!confirm("Clear every checked sprite?")) return;
-      checks.forEach(c => c.checked = false);
+      checks.forEach(c => updateSpriteState(c, "not-found"));
       updateProgress();
       scheduleSave();
     });
