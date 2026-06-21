@@ -168,22 +168,34 @@
     .disclaimers p { margin: 0 0 6px 0; }
     .disclaimers p:last-child { margin-bottom: 0; }
     .disclaimers strong { color: #f4fbff; }
+    .site-footer {
+      display: flex;
+      justify-content: center;
+      padding: 4px 0 2px;
+    }
     .site-counter {
       display: inline-flex;
       align-items: center;
+      gap: 6px;
       min-height: 20px;
-      margin-top: 4px;
-      opacity: .42;
+      color: #b9d5e8;
+      font-size: 11px;
+      text-decoration: none;
+      opacity: .78;
       transition: opacity .12s ease;
     }
     .site-counter:hover,
     .site-counter:focus-visible {
-      opacity: .86;
+      opacity: 1;
     }
     .site-counter img {
       display: block;
       max-width: 100%;
       height: 20px;
+    }
+    .site-counter img:not([src]),
+    .site-counter img.is-hidden {
+      display: none;
     }
     @media (max-width: 720px) {
       body { padding: 8px; }
@@ -234,16 +246,20 @@
       <p><strong>Save notice:</strong> Progress is saved in this browser's local storage. Clearing browser cache/site data, using a different browser/device, or opening the page under a different site URL may remove or hide saved progress.</p>
       <p><strong>Artwork disclaimer:</strong> Fortnite and related artwork are property of Epic Games, Inc. This fan-made checklist is not affiliated with, endorsed by, sponsored by, or approved by Epic Games, Inc.</p>
       <p><strong>© Doomed Gaming</strong></p>
-      <a id="siteCounter" class="site-counter" href="https://hits.sh/sprites.doomedgaming.com/" target="_blank" rel="noopener" aria-label="Site visit counter">
-        <img id="siteCounterImage" alt="Site visits" width="74" height="20" />
-      </a>
     </section>
+
+    <footer class="site-footer" aria-label="Site footer">
+      <a id="siteCounter" class="site-counter" href="https://hits.sh/sprites.doomedgaming.com/" target="_blank" rel="noopener" aria-label="Site visit counter">
+        <span id="siteCounterFallback" hidden>Visitor counter loading</span>
+        <img id="siteCounterImage" src="https://hits.sh/sprites.doomedgaming.com.svg?label=visits&color=17394c&labelColor=07101a" alt="Site visits" width="74" height="20" />
+      </a>
+    </footer>
   </main>
 
   <script>
     const SAVE_NAME = "fortnite-sprite-checklist-save.json";
     const LS_KEY = "fortnite-sprite-checklist:v1";
-    const TRACKER_TARGET = "sprites.doomedgaming.com";
+    const FALLBACK_TRACKER_TARGET = "sprites.doomedgaming.com";
 
     const groups = [
       ["Water Sprites", ["cyan", "gold", "pink", "purple"], [[125,198],[187,198],[250,198],[310,198]]],
@@ -269,10 +285,33 @@
     let dirHandle = null;
     let saveTimer = null;
 
+    function trackerTarget() {
+      if (!location.hostname) return FALLBACK_TRACKER_TARGET;
+      const pathParts = location.pathname.split("/").filter(Boolean);
+      if (location.hostname.endsWith(".github.io") && pathParts.length > 0) {
+        return `${location.hostname}/${pathParts[0]}`;
+      }
+      return location.hostname;
+    }
+
     if (siteCounter && siteCounterImage) {
-      const counterUrl = `https://hits.sh/${TRACKER_TARGET}.svg?label=visits&color=17394c&labelColor=07101a`;
-      siteCounter.href = `https://hits.sh/${TRACKER_TARGET}/`;
+      const siteCounterFallback = document.getElementById("siteCounterFallback");
+      const target = trackerTarget();
+      const counterUrl = `https://hits.sh/${target}.svg?label=visits&color=17394c&labelColor=07101a`;
+      const showCounterImage = () => {
+        siteCounterImage.classList.remove("is-hidden");
+        if (siteCounterFallback) siteCounterFallback.hidden = true;
+      };
+      siteCounter.href = `https://hits.sh/${target}/`;
+      if (siteCounterFallback) siteCounterFallback.hidden = false;
+      siteCounterImage.classList.add("is-hidden");
+      siteCounterImage.addEventListener("load", showCounterImage);
+      siteCounterImage.addEventListener("error", () => {
+        siteCounterImage.classList.add("is-hidden");
+        if (siteCounterFallback) siteCounterFallback.textContent = "Visitor counter unavailable";
+      });
       siteCounterImage.src = counterUrl;
+      if (siteCounterImage.complete && siteCounterImage.naturalWidth > 0) showCounterImage();
     }
 
     function slug(s) { return s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, ""); }
