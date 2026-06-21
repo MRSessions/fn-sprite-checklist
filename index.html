@@ -168,6 +168,23 @@
     .disclaimers p { margin: 0 0 6px 0; }
     .disclaimers p:last-child { margin-bottom: 0; }
     .disclaimers strong { color: #f4fbff; }
+    .site-counter {
+      display: inline-flex;
+      align-items: center;
+      min-height: 20px;
+      margin-top: 4px;
+      opacity: .42;
+      transition: opacity .12s ease;
+    }
+    .site-counter:hover,
+    .site-counter:focus-visible {
+      opacity: .86;
+    }
+    .site-counter img {
+      display: block;
+      max-width: 100%;
+      height: 20px;
+    }
     @media (max-width: 720px) {
       body { padding: 8px; }
       .stage-wrap { padding: 4px; }
@@ -217,12 +234,16 @@
       <p><strong>Save notice:</strong> Progress is saved in this browser's local storage. Clearing browser cache/site data, using a different browser/device, or opening the page under a different site URL may remove or hide saved progress.</p>
       <p><strong>Artwork disclaimer:</strong> Fortnite and related artwork are property of Epic Games, Inc. This fan-made checklist is not affiliated with, endorsed by, sponsored by, or approved by Epic Games, Inc.</p>
       <p><strong>© Doomed Gaming</strong></p>
+      <a id="siteCounter" class="site-counter" href="https://hits.sh/sprites.doomedgaming.com/" target="_blank" rel="noopener" aria-label="Site visit counter">
+        <img id="siteCounterImage" alt="Site visits" width="74" height="20" />
+      </a>
     </section>
   </main>
 
   <script>
     const SAVE_NAME = "fortnite-sprite-checklist-save.json";
     const LS_KEY = "fortnite-sprite-checklist:v1";
+    const TRACKER_TARGET = "sprites.doomedgaming.com";
 
     const groups = [
       ["Water Sprites", ["cyan", "gold", "pink", "purple"], [[125,198],[187,198],[250,198],[310,198]]],
@@ -242,9 +263,17 @@
     const statusEl = document.getElementById("status");
     const countEl = document.getElementById("count");
     const fillEl = document.getElementById("fill");
+    const siteCounter = document.getElementById("siteCounter");
+    const siteCounterImage = document.getElementById("siteCounterImage");
     const checks = [];
     let dirHandle = null;
     let saveTimer = null;
+
+    if (siteCounter && siteCounterImage) {
+      const counterUrl = `https://hits.sh/${TRACKER_TARGET}.svg?label=visits&color=17394c&labelColor=07101a`;
+      siteCounter.href = `https://hits.sh/${TRACKER_TARGET}/`;
+      siteCounterImage.src = counterUrl;
+    }
 
     function slug(s) { return s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, ""); }
 
