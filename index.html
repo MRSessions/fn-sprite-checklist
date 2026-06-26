@@ -147,9 +147,29 @@
       font-weight: 1000;
       line-height: 1;
     }
+    .sprite-groups {
+      display: grid;
+      gap: 22px;
+    }
+    .sprite-group {
+      display: grid;
+      gap: 10px;
+      padding: 14px;
+      background: rgba(0,0,0,.16);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+    }
+    .sprite-group-title {
+      margin: 0;
+      color: #dffcff;
+      font-size: 18px;
+      font-weight: 950;
+      line-height: 1.2;
+      letter-spacing: 0;
+    }
     .sprite-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
       gap: 12px;
       align-items: stretch;
     }
@@ -283,6 +303,9 @@
       .progress { flex-wrap: wrap; }
       .bar { flex-basis: 100%; }
       .count { width: 100%; min-width: 0; text-align: left; }
+      .sprite-groups { gap: 14px; }
+      .sprite-group { padding: 10px; gap: 8px; }
+      .sprite-group-title { font-size: 16px; }
       .sprite-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
       .sprite-card { grid-template-rows: 124px auto; min-height: 178px; padding: 8px; }
       .sprite-art img { width: min(100%, 124px); max-height: 124px; }
@@ -320,7 +343,7 @@
       <div class="key-item"><span class="key-mark is-mastered" aria-hidden="true"></span><span>Mastered</span></div>
     </section>
 
-    <section id="spriteGrid" class="sprite-grid" aria-label="Sprite checklist"></section>
+    <section id="spriteGroups" class="sprite-groups" aria-label="Sprite checklist"></section>
 
     <section class="disclaimers" aria-label="Disclaimer and copyright">
       <p><strong>Save notice:</strong> Progress is saved in this browser's local storage. Existing progress from the previous checklist is mapped into this sprite grid where the sprite still exists.</p>
@@ -421,17 +444,18 @@
         const id = `${filePrefix}${base}-sprite`;
         return {
           id,
+          family,
           name: `${prefix}${family} Sprite`,
           src: `sprites/${id}.webp`
         };
       })),
       ...singleSprites.map(name => {
         const id = slug(name);
-        return { id, name, src: `sprites/${id}.webp` };
+        return { id, family: name, name, src: `sprites/${id}.webp` };
       })
     ];
 
-    const spriteGrid = document.getElementById("spriteGrid");
+    const spriteGroups = document.getElementById("spriteGroups");
     const statusEl = document.getElementById("status");
     const countEl = document.getElementById("count");
     const fillEl = document.getElementById("fill");
@@ -472,7 +496,7 @@
 
     function slug(s) { return s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, ""); }
 
-    for (const sprite of sprites) {
+    function createSpriteCard(sprite) {
       const card = document.createElement("button");
       card.type = "button";
       card.className = "sprite-card";
@@ -492,9 +516,28 @@
         updateProgress();
         scheduleSave();
       });
-      spriteGrid.appendChild(card);
+      return card;
+    }
+
+    for (const family of [...SPRITE_FAMILIES, ...singleSprites]) {
+      const groupSprites = sprites.filter(sprite => sprite.family === family);
+      const group = document.createElement("section");
+      group.className = "sprite-group";
+      group.setAttribute("aria-labelledby", `${slug(family)}-heading`);
+      group.innerHTML = `
+        <h2 id="${slug(family)}-heading" class="sprite-group-title">${family}</h2>
+        <div class="sprite-grid"></div>
+      `;
+      const groupGrid = group.querySelector(".sprite-grid");
+      groupSprites.forEach(sprite => groupGrid.appendChild(createSpriteCard(sprite)));
+      spriteGroups.appendChild(group);
+    }
+
+    function registerCard(card) {
       checks.push(card);
     }
+
+    document.querySelectorAll(".sprite-card").forEach(registerCard);
 
     function normalizeState(value) {
       if (value === true) return "found";
