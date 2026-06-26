@@ -110,6 +110,36 @@
       font-size: 13px;
       font-weight: 800;
     }
+    .search {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex: 1 1 240px;
+      min-width: 220px;
+      margin-left: 96px;
+    }
+    .search label {
+      color: #dffcff;
+      white-space: nowrap;
+    }
+    .search input {
+      width: 100%;
+      min-width: 0;
+      height: 34px;
+      border: 1px solid rgba(255,255,255,.22);
+      border-radius: 999px;
+      padding: 0 13px;
+      color: var(--text);
+      background: rgba(2,8,14,.62);
+      font: inherit;
+      font-weight: 750;
+      outline: none;
+    }
+    .search input:focus {
+      border-color: var(--cyan);
+      box-shadow: 0 0 0 3px rgba(0,215,223,.18);
+    }
+    .search input::placeholder { color: #8fa9ba; }
     .key-item {
       display: inline-flex;
       align-items: center;
@@ -158,6 +188,10 @@
       background: rgba(0,0,0,.16);
       border: 1px solid var(--line);
       border-radius: 12px;
+    }
+    .sprite-group[hidden],
+    .sprite-card[hidden] {
+      display: none;
     }
     .sprite-group-title {
       margin: 0;
@@ -303,6 +337,7 @@
       .progress { flex-wrap: wrap; }
       .bar { flex-basis: 100%; }
       .count { width: 100%; min-width: 0; text-align: left; }
+      .search { flex-basis: 100%; min-width: 0; margin-left: 0; margin-top: 4px; }
       .sprite-groups { gap: 14px; }
       .sprite-group { padding: 10px; gap: 8px; }
       .sprite-group-title { font-size: 16px; }
@@ -341,6 +376,10 @@
       <div class="key-item"><span class="key-mark" aria-hidden="true"></span><span>Not Found</span></div>
       <div class="key-item"><span class="key-mark is-found" aria-hidden="true"></span><span>Found</span></div>
       <div class="key-item"><span class="key-mark is-mastered" aria-hidden="true"></span><span>Mastered</span></div>
+      <div class="search">
+        <label for="spriteSearch">Search</label>
+        <input id="spriteSearch" type="search" autocomplete="off" placeholder="Sprite name or type" />
+      </div>
     </section>
 
     <section id="spriteGroups" class="sprite-groups" aria-label="Sprite checklist"></section>
@@ -459,6 +498,7 @@
     const statusEl = document.getElementById("status");
     const countEl = document.getElementById("count");
     const fillEl = document.getElementById("fill");
+    const spriteSearch = document.getElementById("spriteSearch");
     const siteCounter = document.getElementById("siteCounter");
     const siteCounterImage = document.getElementById("siteCounterImage");
     const checks = [];
@@ -523,6 +563,7 @@
       const groupSprites = sprites.filter(sprite => sprite.family === family);
       const group = document.createElement("section");
       group.className = "sprite-group";
+      group.dataset.family = family;
       group.setAttribute("aria-labelledby", `${slug(family)}-heading`);
       group.innerHTML = `
         <h2 id="${slug(family)}-heading" class="sprite-group-title">${family}</h2>
@@ -538,6 +579,22 @@
     }
 
     document.querySelectorAll(".sprite-card").forEach(registerCard);
+
+    function applySearch() {
+      const query = (spriteSearch?.value || "").trim().toLowerCase();
+      document.querySelectorAll(".sprite-group").forEach(group => {
+        let visibleCount = 0;
+        group.querySelectorAll(".sprite-card").forEach(card => {
+          const haystack = `${card.dataset.name || ""} ${group.dataset.family || ""}`.toLowerCase();
+          const isVisible = !query || haystack.includes(query);
+          card.hidden = !isVisible;
+          if (isVisible) visibleCount += 1;
+        });
+        group.hidden = visibleCount === 0;
+      });
+    }
+
+    if (spriteSearch) spriteSearch.addEventListener("input", applySearch);
 
     function normalizeState(value) {
       if (value === true) return "found";
