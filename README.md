@@ -5,13 +5,16 @@ An interactive fan-made checklist for tracking collected Fortnite sprites.
 ## Files
 
 - `index.html` — the interactive checklist page.
-- `img_25ef196383a7.png` — the checklist artwork/image used by the page.
+- `sprites/` — individual local sprite images used by the checklist grid.
+- `img_25ef196383a7.png` — legacy checklist artwork kept in the repo, but no longer used by the page.
 
-Keep both files in the same directory. The HTML references the image by relative path, so the image file must stay next to the HTML file unless you update the `<img src="...">` path.
+Keep `index.html` and the `sprites/` folder together. The HTML references the sprite images by relative path.
 
 ## Saving progress
 
 Progress is saved automatically in the user's browser using `localStorage`.
+
+The current page uses the same save key as the previous image-overlay checklist and maps older sprite IDs into the new individual sprite cards where the sprite still exists.
 
 Important notes:
 

@@ -9,6 +9,10 @@
     :root {
       color-scheme: dark;
       --panel: rgba(8, 16, 26, 0.86);
+      --panel-strong: rgba(10, 22, 36, 0.96);
+      --line: rgba(255,255,255,.12);
+      --text: #f4fbff;
+      --muted: #b9d5e8;
       --cyan: #00d7df;
       --green: #57ff7a;
       --yellow: #ffe45d;
@@ -17,18 +21,22 @@
     }
     body {
       margin: 0;
+      width: 100%;
       min-height: 100vh;
       font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: radial-gradient(circle at top, #183248, #07101a 60%, #03070c);
-      color: #f4fbff;
-      display: grid;
-      place-items: start center;
+      background:
+        radial-gradient(circle at top left, rgba(0,215,223,.16), transparent 34rem),
+        radial-gradient(circle at top right, rgba(87,255,122,.12), transparent 32rem),
+        linear-gradient(145deg, #07101a, #102130 52%, #05090f);
+      color: var(--text);
       padding: 18px;
+      overflow-x: hidden;
     }
     .app {
-      width: min(100%, 1120px);
+      width: min(100%, 1180px);
       display: grid;
       gap: 14px;
+      margin: 0 auto;
     }
     .toolbar {
       display: flex;
@@ -38,14 +46,14 @@
       gap: 12px;
       padding: 12px 14px;
       background: var(--panel);
-      border: 1px solid rgba(255,255,255,.12);
+      border: 1px solid var(--line);
       border-radius: 16px;
       box-shadow: var(--shadow);
       backdrop-filter: blur(10px);
     }
-    .title { display: flex; flex-direction: column; gap: 2px; }
+    .title { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
     h1 { margin: 0; font-size: clamp(18px, 3vw, 28px); letter-spacing: .03em; }
-    .subtitle { color: #b9d5e8; font-size: 13px; }
+    .subtitle { color: var(--muted); font-size: 13px; overflow-wrap: anywhere; }
     .actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
     button, label.file-button {
       border: 0;
@@ -58,6 +66,7 @@
       box-shadow: 0 8px 22px rgba(0, 215, 223, .22);
       transition: transform .12s ease, filter .12s ease;
       font-size: 13px;
+      font-family: inherit;
     }
     button:hover, label.file-button:hover { transform: translateY(-1px); filter: brightness(1.08); }
     button.secondary, label.file-button.secondary { background: #d9e8f4; box-shadow: none; }
@@ -69,87 +78,25 @@
       font-size: 13px;
       line-height: 1.35;
     }
-    .stage-wrap {
-      display: grid;
-      place-items: center;
-      overflow: auto;
-      padding: 10px;
-      background: rgba(0,0,0,.22);
-      border: 1px solid rgba(255,255,255,.1);
-      border-radius: 18px;
-      box-shadow: var(--shadow);
+    .progress {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      padding: 10px 14px;
+      background: var(--panel);
+      border-radius: 16px;
+      border: 1px solid var(--line);
     }
-    .stage {
-      position: relative;
-      width: min(100%, 778px);
-      aspect-ratio: 778 / 972;
-      line-height: 0;
-      user-select: none;
+    .bar {
+      flex: 1;
+      min-width: 0;
+      height: 14px;
+      border-radius: 999px;
+      overflow: hidden;
+      background: rgba(255,255,255,.13);
     }
-    .stage img {
-      width: 100%;
-      height: 100%;
-      display: block;
-      border-radius: 4px;
-      box-shadow: 0 0 0 1px rgba(255,255,255,.15), 0 10px 36px rgba(0,0,0,.35);
-      pointer-events: none;
-    }
-    .sprite-check {
-      position: absolute;
-      width: 3.95%;
-      aspect-ratio: 1 / 1;
-      transform: translate(-50%, -50%);
-      margin: 0;
-      padding: 0;
-      appearance: none;
-      -webkit-appearance: none;
-      cursor: pointer;
-      border: 4px solid transparent;
-      border-radius: 0;
-      background: transparent;
-      outline: none;
-      transition: transform .12s ease, background .12s ease, border-color .12s ease, box-shadow .12s ease;
-    }
-    .sprite-check:hover {
-      transform: translate(-50%, -50%) scale(1.08);
-      box-shadow: 0 0 0 4px rgba(0,215,223,.35);
-      background: rgba(0,215,223,.12);
-    }
-    .sprite-check.is-found {
-      background: rgba(80,255,125,.86);
-      border-color: #041007;
-      box-shadow: 0 0 0 4px rgba(80,255,125,.22), inset 0 0 0 2px rgba(255,255,255,.45);
-    }
-    .sprite-check.is-found::after {
-      content: "✓";
-      position: absolute;
-      inset: -12% 0 0 0;
-      display: grid;
-      place-items: center;
-      color: #061018;
-      font-size: clamp(17px, 4vw, 34px);
-      font-weight: 1000;
-      line-height: 1;
-      text-shadow: 0 1px 0 rgba(255,255,255,.35);
-    }
-    .sprite-check.is-mastered {
-      background: rgba(255,228,93,.94);
-      border-color: #120d02;
-      box-shadow: 0 0 0 4px rgba(255,228,93,.26), inset 0 0 0 2px rgba(255,255,255,.48);
-    }
-    .sprite-check.is-mastered::after {
-      content: "♛";
-      position: absolute;
-      inset: -11% 0 0 0;
-      display: grid;
-      place-items: center;
-      color: #221700;
-      font-size: clamp(16px, 3.8vw, 31px);
-      font-weight: 1000;
-      line-height: 1;
-      text-shadow: 0 1px 0 rgba(255,255,255,.42);
-    }
-    .sprite-check:focus-visible { box-shadow: 0 0 0 5px var(--yellow); }
+    .fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--cyan), var(--green)); transition: width .18s ease; }
+    .count { min-width: 176px; text-align: right; font-weight: 900; color: #dffcff; white-space: nowrap; }
     .key {
       display: flex;
       flex-wrap: wrap;
@@ -157,7 +104,7 @@
       align-items: center;
       padding: 10px 14px;
       background: var(--panel);
-      border: 1px solid rgba(255,255,255,.12);
+      border: 1px solid var(--line);
       border-radius: 16px;
       color: #dffcff;
       font-size: 13px;
@@ -200,34 +147,100 @@
       font-weight: 1000;
       line-height: 1;
     }
-    .progress {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-      padding: 10px 14px;
-      background: var(--panel);
-      border-radius: 16px;
-      border: 1px solid rgba(255,255,255,.12);
+    .sprite-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 12px;
+      align-items: stretch;
     }
-    .bar {
-      flex: 1;
-      height: 14px;
-      border-radius: 999px;
+    .sprite-card {
+      position: relative;
+      display: grid;
+      grid-template-rows: 150px auto;
+      min-height: 204px;
+      width: 100%;
+      padding: 10px;
+      color: var(--text);
+      text-align: left;
+      background: var(--panel-strong);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: 0 10px 32px rgba(0,0,0,.28);
       overflow: hidden;
-      background: rgba(255,255,255,.13);
     }
-    .fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--cyan), var(--green)); transition: width .18s ease; }
-    .count { min-width: 176px; text-align: right; font-weight: 900; color: #dffcff; white-space: nowrap; }
-    .hint {
-      margin: 0;
-      color: #b9d5e8;
+    .sprite-card:hover {
+      transform: translateY(-2px);
+      filter: none;
+      border-color: rgba(0,215,223,.42);
+      box-shadow: 0 18px 44px rgba(0,0,0,.34), 0 0 0 1px rgba(0,215,223,.12);
+    }
+    .sprite-card:focus-visible {
+      outline: 4px solid var(--yellow);
+      outline-offset: 2px;
+    }
+    .sprite-card.is-found {
+      border-color: rgba(80,255,125,.74);
+      background: linear-gradient(180deg, rgba(8,22,29,.96), rgba(14,52,31,.92));
+    }
+    .sprite-card.is-mastered {
+      border-color: rgba(255,228,93,.78);
+      background: linear-gradient(180deg, rgba(28,24,10,.97), rgba(58,45,13,.92));
+    }
+    .sprite-art {
+      display: grid;
+      place-items: center;
+      min-height: 0;
+    }
+    .sprite-art img {
+      display: block;
+      width: min(100%, 150px);
+      height: auto;
+      max-height: 150px;
+      aspect-ratio: 1 / 1;
+      object-fit: contain;
+      filter: drop-shadow(0 14px 18px rgba(0,0,0,.32));
+      pointer-events: none;
+    }
+    .sprite-name {
+      min-height: 34px;
+      color: #f4fbff;
       font-size: 13px;
-      line-height: 1.45;
+      font-weight: 900;
+      line-height: 1.25;
+      text-align: center;
+      overflow-wrap: anywhere;
+    }
+    .sprite-state {
+      position: absolute;
+      top: 9px;
+      right: 9px;
+      display: grid;
+      place-items: center;
+      width: 34px;
+      height: 34px;
+      border: 3px solid rgba(255,255,255,.38);
+      background: rgba(4,9,14,.74);
+      color: transparent;
+      font-size: 27px;
+      font-weight: 1000;
+      line-height: 1;
+      box-shadow: 0 8px 22px rgba(0,0,0,.28);
+    }
+    .sprite-card.is-found .sprite-state {
+      background: rgba(80,255,125,.92);
+      border-color: #041007;
+      color: #061018;
+    }
+    .sprite-card.is-mastered .sprite-state {
+      background: rgba(255,228,93,.96);
+      border-color: #120d02;
+      color: #221700;
+      font-size: 25px;
     }
     .disclaimers {
       padding: 12px 14px;
       background: var(--panel);
-      border: 1px solid rgba(255,255,255,.12);
+      border: 1px solid var(--line);
       border-radius: 16px;
       color: #c9ddeb;
       font-size: 12px;
@@ -237,6 +250,7 @@
     .disclaimers p { margin: 0 0 6px 0; }
     .disclaimers p:last-child { margin-bottom: 0; }
     .disclaimers strong { color: #f4fbff; }
+    .disclaimers a { color: #8ef6ff; }
     .site-footer {
       display: flex;
       justify-content: center;
@@ -247,30 +261,31 @@
       align-items: center;
       gap: 6px;
       min-height: 20px;
-      color: #b9d5e8;
+      color: var(--muted);
       font-size: 11px;
       text-decoration: none;
       opacity: .78;
       transition: opacity .12s ease;
     }
     .site-counter:hover,
-    .site-counter:focus-visible {
-      opacity: 1;
-    }
+    .site-counter:focus-visible { opacity: 1; }
     .site-counter img {
       display: block;
       max-width: 100%;
       height: 20px;
     }
     .site-counter img:not([src]),
-    .site-counter img.is-hidden {
-      display: none;
-    }
+    .site-counter img.is-hidden { display: none; }
     @media (max-width: 720px) {
-      body { padding: 8px; }
-      .stage-wrap { padding: 4px; }
+      body { padding: 0; }
+      .app { width: 100vw; padding: 8px; }
       .toolbar { border-radius: 12px; }
-      .sprite-check { border-width: 3px; }
+      .progress { flex-wrap: wrap; }
+      .bar { flex-basis: 100%; }
+      .count { width: 100%; min-width: 0; text-align: left; }
+      .sprite-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+      .sprite-card { grid-template-rows: 124px auto; min-height: 178px; padding: 8px; }
+      .sprite-art img { width: min(100%, 124px); max-height: 124px; }
     }
   </style>
 </head>
@@ -279,7 +294,7 @@
     <section class="toolbar" aria-label="Checklist controls">
       <div class="title">
         <h1>Fortnite Sprite Checklist</h1>
-        <div class="subtitle">Click boxes on the image. Progress saves automatically in this browser.</div>
+        <div class="subtitle">Click a sprite to cycle Not Found, Found, and Mastered. Progress saves automatically in this browser.</div>
       </div>
       <!-- Save controls hidden by request. Browser localStorage autosave is always active.
       <div class="actions">
@@ -296,7 +311,7 @@
 
     <section class="progress" aria-label="Progress">
       <div class="bar"><div id="fill" class="fill"></div></div>
-      <div id="count" class="count">0 / 41</div>
+      <div id="count" class="count">0 / 61</div>
     </section>
 
     <section class="key" aria-label="Checklist key">
@@ -305,21 +320,12 @@
       <div class="key-item"><span class="key-mark is-mastered" aria-hidden="true"></span><span>Mastered</span></div>
     </section>
 
-    <section class="stage-wrap">
-      <div id="stage" class="stage" aria-label="Sprite checklist image with interactive checkboxes">
-        <img src="img_25ef196383a7.png" alt="Fortnite Sprite Checklist" />
-      </div>
-    </section>
-
-    <!-- Save/import/download hint hidden with the save controls by request.
-    <p class="hint">
-      Tip: Chrome/Edge support direct file saving through the File System Access API. Firefox may require using <b>Download save</b> and placing the JSON next to this HTML manually, then <b>Import save</b> next time.
-    </p>
-    -->
+    <section id="spriteGrid" class="sprite-grid" aria-label="Sprite checklist"></section>
 
     <section class="disclaimers" aria-label="Disclaimer and copyright">
-      <p><strong>Save notice:</strong> Progress is saved in this browser's local storage. Clearing browser cache/site data, using a different browser/device, or opening the page under a different site URL may remove or hide saved progress.</p>
+      <p><strong>Save notice:</strong> Progress is saved in this browser's local storage. Existing progress from the previous checklist is mapped into this sprite grid where the sprite still exists.</p>
       <p><strong>Artwork disclaimer:</strong> Fortnite and related artwork are property of Epic Games, Inc. This fan-made checklist is not affiliated with, endorsed by, sponsored by, or approved by Epic Games, Inc.</p>
+      <p><strong>Sprite image source:</strong> Local sprite images were sourced from <a href="https://fortnite.gg/sprites" target="_blank" rel="noopener">Fortnite.GG sprites</a>.</p>
       <p><strong>© Doomed Gaming</strong></p>
     </section>
 
@@ -341,22 +347,91 @@
       found: "Found",
       mastered: "Mastered"
     };
+    const VARIANTS = [
+      ["", ""],
+      ["Gold ", "gold-"],
+      ["Gummy ", "gummy-"],
+      ["Galaxy ", "galaxy-"]
+    ];
+    const SPRITE_FAMILIES = [
+      "Water",
+      "Earth",
+      "Fire",
+      "Duck",
+      "Ghost",
+      "Dream",
+      "Demon",
+      "Punk",
+      "King",
+      "Zero Point",
+      "Fishy",
+      "Striker",
+      "Aura",
+      "Boss",
+      "Grim"
+    ];
+    const singleSprites = ["Burnt Peanut"];
+    const legacyIds = {
+      "water-sprite": ["water-sprites-cyan"],
+      "gold-water-sprite": ["water-sprites-gold"],
+      "gummy-water-sprite": ["water-sprites-pink"],
+      "galaxy-water-sprite": ["water-sprites-purple"],
+      "dream-sprite": ["dream-sprites-gray"],
+      "gold-dream-sprite": ["dream-sprites-gold"],
+      "gummy-dream-sprite": ["dream-sprites-pink"],
+      "galaxy-dream-sprite": ["dream-sprites-purple"],
+      "earth-sprite": ["earth-sprites-brown"],
+      "gold-earth-sprite": ["earth-sprites-gold"],
+      "gummy-earth-sprite": ["earth-sprites-pink"],
+      "galaxy-earth-sprite": ["earth-sprites-purple"],
+      "punk-sprite": ["punk-sprites-black"],
+      "gold-punk-sprite": ["punk-sprites-gold"],
+      "gummy-punk-sprite": ["punk-sprites-pink"],
+      "galaxy-punk-sprite": ["punk-sprites-purple"],
+      "fire-sprite": ["fire-sprites-orange"],
+      "gold-fire-sprite": ["fire-sprites-gold"],
+      "gummy-fire-sprite": ["fire-sprites-pink"],
+      "galaxy-fire-sprite": ["fire-sprites-purple"],
+      "king-sprite": ["king-sprites-white"],
+      "gold-king-sprite": ["king-sprites-gold"],
+      "gummy-king-sprite": ["king-sprites-pink"],
+      "galaxy-king-sprite": ["king-sprites-purple"],
+      "duck-sprite": ["duck-sprites-orange"],
+      "gold-duck-sprite": ["duck-sprites-gold"],
+      "gummy-duck-sprite": ["duck-sprites-pink"],
+      "galaxy-duck-sprite": ["duck-sprites-purple"],
+      "zero-point-sprite": ["zero-point-sprites-black"],
+      "gold-zero-point-sprite": ["zero-point-sprites-gold"],
+      "gummy-zero-point-sprite": ["zero-point-sprites-pink"],
+      "galaxy-zero-point-sprite": ["zero-point-sprites-blue"],
+      "ghost-sprite": ["ghost-sprites-pink"],
+      "gold-ghost-sprite": ["ghost-sprites-gold"],
+      "gummy-ghost-sprite": ["ghost-sprites-orange"],
+      "galaxy-ghost-sprite": ["ghost-sprites-purple"],
+      "demon-sprite": ["demon-sprites-black"],
+      "gold-demon-sprite": ["demon-sprites-gold"],
+      "gummy-demon-sprite": ["demon-sprites-red"],
+      "galaxy-demon-sprite": ["demon-sprites-purple"],
+      "burnt-peanut": ["burnt-peanut-single"]
+    };
 
-    const groups = [
-      ["Water Sprites", ["cyan", "gold", "pink", "purple"], [[125,198],[187,198],[250,198],[310,198]]],
-      ["Dream Sprites", ["gray", "gold", "pink", "purple"], [[463,190],[525,190],[591,190],[655,190]]],
-      ["Earth Sprites", ["brown", "gold", "pink", "purple"], [[125,347],[186,347],[247,347],[308,347]]],
-      ["Punk Sprites", ["black", "gold", "pink", "purple"], [[458,345],[524,345],[595,345],[659,345]]],
-      ["Fire Sprites", ["orange", "gold", "pink", "purple"], [[123,503],[185,504],[247,504],[309,505]]],
-      ["King Sprites", ["white", "gold", "pink", "purple"], [[453,502],[519,502],[586,502],[656,502]]],
-      ["Duck Sprites", ["orange", "gold", "pink", "purple"], [[122,649],[185,650],[252,651],[319,651]]],
-      ["Zero Point Sprites", ["black", "gold", "pink", "blue"], [[454,651],[522,649],[587,649],[655,651]]],
-      ["Ghost Sprites", ["pink", "gold", "orange", "purple"], [[122,791],[184,791],[248,791],[309,791]]],
-      ["Demon Sprites", ["black", "gold", "red", "purple"], [[456,795],[523,795],[589,795],[654,795]]],
-      ["Burnt Peanut", ["single"], [[389,930]]]
+    const sprites = [
+      ...SPRITE_FAMILIES.flatMap(family => VARIANTS.map(([prefix, filePrefix]) => {
+        const base = slug(family);
+        const id = `${filePrefix}${base}-sprite`;
+        return {
+          id,
+          name: `${prefix}${family} Sprite`,
+          src: `sprites/${id}.webp`
+        };
+      })),
+      ...singleSprites.map(name => {
+        const id = slug(name);
+        return { id, name, src: `sprites/${id}.webp` };
+      })
     ];
 
-    const stage = document.getElementById("stage");
+    const spriteGrid = document.getElementById("spriteGrid");
     const statusEl = document.getElementById("status");
     const countEl = document.getElementById("count");
     const fillEl = document.getElementById("fill");
@@ -397,29 +472,28 @@
 
     function slug(s) { return s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, ""); }
 
-    for (const [groupName, colors, coords] of groups) {
-      coords.forEach(([x, y], i) => {
-        const id = `${slug(groupName)}-${colors[i] || i + 1}`;
-        const input = document.createElement("button");
-        input.type = "button";
-        input.className = "sprite-check";
-        input.id = id;
-        input.dataset.group = groupName;
-        input.dataset.color = colors[i] || "sprite";
-        input.dataset.state = "not-found";
-        input.style.left = `${(x / 778) * 100}%`;
-        input.style.top = `${(y / 972) * 100}%`;
-        updateSpriteState(input, "not-found");
-        input.addEventListener("click", () => {
-          const currentIndex = STATES.indexOf(input.dataset.state);
-          const nextState = STATES[(currentIndex + 1) % STATES.length];
-          updateSpriteState(input, nextState);
-          updateProgress();
-          scheduleSave();
-        });
-        stage.appendChild(input);
-        checks.push(input);
+    for (const sprite of sprites) {
+      const card = document.createElement("button");
+      card.type = "button";
+      card.className = "sprite-card";
+      card.id = sprite.id;
+      card.dataset.name = sprite.name;
+      card.dataset.state = "not-found";
+      card.innerHTML = `
+        <span class="sprite-state" aria-hidden="true"></span>
+        <span class="sprite-art"><img src="${sprite.src}" alt="" loading="lazy" width="512" height="512"></span>
+        <span class="sprite-name">${sprite.name}</span>
+      `;
+      updateSpriteState(card, "not-found");
+      card.addEventListener("click", () => {
+        const currentIndex = STATES.indexOf(card.dataset.state);
+        const nextState = STATES[(currentIndex + 1) % STATES.length];
+        updateSpriteState(card, nextState);
+        updateProgress();
+        scheduleSave();
       });
+      spriteGrid.appendChild(card);
+      checks.push(card);
     }
 
     function normalizeState(value) {
@@ -428,20 +502,21 @@
       return "not-found";
     }
 
-    function updateSpriteState(input, state) {
+    function updateSpriteState(card, state) {
       const normalized = normalizeState(state);
-      const spriteName = `${input.dataset.group} — ${input.dataset.color || "sprite"}`;
-      input.dataset.state = normalized;
-      input.classList.toggle("is-found", normalized === "found");
-      input.classList.toggle("is-mastered", normalized === "mastered");
-      input.title = `${spriteName}: ${STATE_LABELS[normalized]}`;
-      input.setAttribute("aria-label", input.title);
-      input.setAttribute("aria-pressed", normalized === "not-found" ? "false" : "true");
+      const stateMark = card.querySelector(".sprite-state");
+      card.dataset.state = normalized;
+      card.classList.toggle("is-found", normalized === "found");
+      card.classList.toggle("is-mastered", normalized === "mastered");
+      if (stateMark) stateMark.textContent = normalized === "mastered" ? "♛" : normalized === "found" ? "✓" : "";
+      card.title = `${card.dataset.name}: ${STATE_LABELS[normalized]}`;
+      card.setAttribute("aria-label", card.title);
+      card.setAttribute("aria-pressed", normalized === "not-found" ? "false" : "true");
     }
 
     function currentData() {
       return {
-        version: 2,
+        version: 3,
         savedAt: new Date().toISOString(),
         total: checks.length,
         states: Object.fromEntries(checks.map(c => [c.id, c.dataset.state])),
@@ -449,10 +524,20 @@
       };
     }
 
+    function stateForCard(card, states, checked) {
+      if (states && Object.prototype.hasOwnProperty.call(states, card.id)) return states[card.id];
+      if (checked && Object.prototype.hasOwnProperty.call(checked, card.id)) return checked[card.id];
+      for (const legacyId of legacyIds[card.id] || []) {
+        if (states && Object.prototype.hasOwnProperty.call(states, legacyId)) return states[legacyId];
+        if (checked && Object.prototype.hasOwnProperty.call(checked, legacyId)) return checked[legacyId];
+      }
+      return "not-found";
+    }
+
     function applyData(data) {
       const states = data && data.states ? data.states : null;
       const checked = data && data.checked ? data.checked : data || {};
-      checks.forEach(c => updateSpriteState(c, states ? states[c.id] : checked[c.id]));
+      checks.forEach(c => updateSpriteState(c, stateForCard(c, states, checked)));
       updateProgress();
     }
 
@@ -579,6 +664,7 @@
       const saved = localStorage.getItem(LS_KEY);
       if (saved) {
         applyData(JSON.parse(saved));
+        saveLocal();
         setStatus(`Loaded browser autosave. Click <b>Enable file saving</b> to read/write <b>${SAVE_NAME}</b> in this folder.`);
       } else {
         updateProgress();
