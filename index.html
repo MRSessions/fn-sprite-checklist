@@ -4,6 +4,9 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Fortnite Sprite Checklist</title>
+  <link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="12" fill="%2307101a"/><circle cx="32" cy="32" r="21" fill="%2300d7df"/><path d="M22 34l7 7 15-18" fill="none" stroke="%23061018" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg>' />
+  <link rel="preload" as="image" href="sprites/water-sprite.webp" fetchpriority="high" />
+  <link rel="preload" as="image" href="sprites/gold-water-sprite.webp" fetchpriority="high" />
   <style>
     * { box-sizing: border-box; }
     :root {
@@ -487,7 +490,7 @@
     <footer class="site-footer" aria-label="Site footer">
       <a id="siteCounter" class="site-counter" href="https://hits.sh/sprites.doomedgaming.com/" target="_blank" rel="noopener" aria-label="Site visit counter">
         <span id="siteCounterFallback" hidden>Visitor counter loading</span>
-        <img id="siteCounterImage" src="https://hits.sh/sprites.doomedgaming.com.svg?label=visits&color=17394c&labelColor=07101a" alt="Site visits" width="74" height="20" />
+        <img id="siteCounterImage" alt="Site visits" width="74" height="20" />
       </a>
     </footer>
   </main>
@@ -496,6 +499,7 @@
     const SAVE_NAME = "fortnite-sprite-checklist-save.json";
     const LS_KEY = "fortnite-sprite-checklist:v1";
     const FALLBACK_TRACKER_TARGET = "sprites.doomedgaming.com";
+    const EAGER_IMAGE_COUNT = 2;
     const STATES = ["not-found", "found", "mastered"];
     const STATE_LABELS = {
       "not-found": "Not Found",
@@ -596,8 +600,10 @@
     const siteCounter = document.getElementById("siteCounter");
     const siteCounterImage = document.getElementById("siteCounterImage");
     const checks = [];
+    const lazyImages = new Set();
     let dirHandle = null;
     let saveTimer = null;
+    let imageObserver = null;
 
     function trackerTarget() {
       if (!location.hostname) return FALLBACK_TRACKER_TARGET;
@@ -608,7 +614,8 @@
       return location.hostname;
     }
 
-    if (siteCounter && siteCounterImage) {
+    function initSiteCounter() {
+      if (!siteCounter || !siteCounterImage) return;
       const siteCounterFallback = document.getElementById("siteCounterFallback");
       const target = trackerTarget();
       const counterUrl = `https://hits.sh/${target}.svg?label=visits&color=17394c&labelColor=07101a`;
@@ -628,10 +635,38 @@
       if (siteCounterImage.complete && siteCounterImage.naturalWidth > 0) showCounterImage();
     }
 
+    if ("requestIdleCallback" in window) {
+      window.addEventListener("load", () => requestIdleCallback(initSiteCounter, { timeout: 3000 }), { once: true });
+    } else {
+      window.addEventListener("load", () => setTimeout(initSiteCounter, 1000), { once: true });
+    }
+
     function slug(s) { return s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, ""); }
 
-    function createSpriteCard(sprite) {
+    function loadSpriteImage(img) {
+      if (!img || !img.dataset.src) return;
+      img.src = img.dataset.src;
+      img.removeAttribute("data-src");
+      lazyImages.delete(img);
+      if (imageObserver) imageObserver.unobserve(img);
+    }
+
+    function observeLazyImage(img) {
+      lazyImages.add(img);
+      if (imageObserver) imageObserver.observe(img);
+    }
+
+    if ("IntersectionObserver" in window) {
+      imageObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) loadSpriteImage(entry.target);
+        });
+      }, { rootMargin: "400px 0px" });
+    }
+
+    function createSpriteCard(sprite, index) {
       const card = document.createElement("button");
+      const isEagerImage = index < EAGER_IMAGE_COUNT;
       card.type = "button";
       card.className = "sprite-card";
       card.id = sprite.id;
@@ -639,9 +674,10 @@
       card.dataset.state = "not-found";
       card.innerHTML = `
         <span class="sprite-state" aria-hidden="true"></span>
-        <span class="sprite-art"><img src="${sprite.src}" alt="" loading="lazy" width="512" height="512"></span>
+        <span class="sprite-art"><img ${isEagerImage ? `src="${sprite.src}" loading="eager" fetchpriority="high"` : `data-src="${sprite.src}" loading="lazy" fetchpriority="low"`} alt="" decoding="async" width="512" height="512"></span>
         <span class="sprite-name">${sprite.name}</span>
       `;
+      if (!isEagerImage) observeLazyImage(card.querySelector("img"));
       updateSpriteState(card, "not-found");
       card.addEventListener("click", () => {
         const currentIndex = STATES.indexOf(card.dataset.state);
@@ -665,9 +701,11 @@
         <div class="sprite-grid"></div>
       `;
       const groupGrid = group.querySelector(".sprite-grid");
-      groupSprites.forEach(sprite => groupGrid.appendChild(createSpriteCard(sprite)));
+      groupSprites.forEach(sprite => groupGrid.appendChild(createSpriteCard(sprite, sprites.indexOf(sprite))));
       spriteGroups.appendChild(group);
     }
+
+    if (!imageObserver) lazyImages.forEach(loadSpriteImage);
 
     function registerCard(card) {
       checks.push(card);
