@@ -98,9 +98,9 @@
     .fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--cyan), var(--green)); transition: width .18s ease; }
     .count { min-width: 176px; text-align: right; font-weight: 900; color: #dffcff; white-space: nowrap; }
     .key {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px 14px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(220px, 1fr);
+      gap: 14px;
       align-items: center;
       padding: 10px 14px;
       background: var(--panel);
@@ -110,13 +110,22 @@
       font-size: 13px;
       font-weight: 800;
     }
+    .key-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 14px;
+      align-items: center;
+      min-width: 0;
+      min-inline-size: 0;
+    }
     .search {
       display: flex;
       align-items: center;
       gap: 8px;
-      flex: 1 1 240px;
-      min-width: 220px;
-      margin-left: 96px;
+      justify-self: end;
+      min-width: 0;
+      min-inline-size: 0;
+      width: min(100%, 320px);
     }
     .search label {
       color: #dffcff;
@@ -140,6 +149,53 @@
       box-shadow: 0 0 0 3px rgba(0,215,223,.18);
     }
     .search input::placeholder { color: #8fa9ba; }
+    .status-filter {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px;
+      min-width: 0;
+      min-inline-size: 0;
+      border: 0;
+      margin: 0;
+      padding: 0;
+    }
+    .status-filter legend {
+      float: left;
+      margin-right: 2px;
+      color: #dffcff;
+      font-weight: 800;
+      line-height: 28px;
+    }
+    .status-filter label {
+      display: inline-grid;
+      place-items: center;
+      min-height: 28px;
+      padding: 0 10px;
+      border: 1px solid rgba(255,255,255,.22);
+      border-radius: 999px;
+      color: #dffcff;
+      background: rgba(2,8,14,.46);
+      cursor: pointer;
+      user-select: none;
+    }
+    .status-filter input {
+      position: absolute;
+      inline-size: 1px;
+      block-size: 1px;
+      opacity: 0;
+      pointer-events: none;
+    }
+    .status-filter label:has(input:checked) {
+      border-color: rgba(0,215,223,.76);
+      color: #061018;
+      background: var(--cyan);
+      box-shadow: 0 8px 22px rgba(0,215,223,.18);
+    }
+    .status-filter label:has(input:focus-visible) {
+      outline: 3px solid var(--yellow);
+      outline-offset: 2px;
+    }
     .key-item {
       display: inline-flex;
       align-items: center;
@@ -337,11 +393,39 @@
       .progress { flex-wrap: wrap; }
       .bar { flex-basis: 100%; }
       .count { width: 100%; min-width: 0; text-align: left; }
-      .search { flex-basis: 100%; min-width: 0; margin-left: 0; margin-top: 4px; }
+      .key { grid-template-columns: 1fr; gap: 10px; }
+      .key-legend {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 8px;
+      }
+      .key-item {
+        min-width: 0;
+        gap: 6px;
+      }
+      .key-item span:last-child {
+        min-width: 0;
+        overflow-wrap: anywhere;
+      }
+      .status-filter {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+      }
+      .status-filter legend {
+        float: none;
+        grid-column: 1 / -1;
+        margin: 0;
+        line-height: 1.2;
+      }
+      .status-filter label {
+        min-height: 34px;
+      }
+      .search { justify-self: stretch; width: 100%; margin-top: 0; }
       .sprite-groups { gap: 14px; }
       .sprite-group { padding: 10px; gap: 8px; }
       .sprite-group-title { font-size: 16px; }
-      .sprite-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+      .sprite-grid { grid-template-columns: repeat(auto-fit, minmax(min(150px, 100%), 1fr)); gap: 8px; }
       .sprite-card { grid-template-rows: 124px auto; min-height: 178px; padding: 8px; }
       .sprite-art img { width: min(100%, 124px); max-height: 124px; }
     }
@@ -373,9 +457,18 @@
     </section>
 
     <section class="key" aria-label="Checklist key">
-      <div class="key-item"><span class="key-mark" aria-hidden="true"></span><span>Not Found</span></div>
-      <div class="key-item"><span class="key-mark is-found" aria-hidden="true"></span><span>Found</span></div>
-      <div class="key-item"><span class="key-mark is-mastered" aria-hidden="true"></span><span>Mastered</span></div>
+      <div class="key-legend">
+        <div class="key-item"><span class="key-mark" aria-hidden="true"></span><span>Not Found</span></div>
+        <div class="key-item"><span class="key-mark is-found" aria-hidden="true"></span><span>Found</span></div>
+        <div class="key-item"><span class="key-mark is-mastered" aria-hidden="true"></span><span>Mastered</span></div>
+      </div>
+      <fieldset class="status-filter" aria-label="Filter by sprite status">
+        <legend>Show</legend>
+        <label><input type="radio" name="statusFilter" value="all" checked>All</label>
+        <label><input type="radio" name="statusFilter" value="not-found">Not Found</label>
+        <label><input type="radio" name="statusFilter" value="found">Found</label>
+        <label><input type="radio" name="statusFilter" value="mastered">Mastered</label>
+      </fieldset>
       <div class="search">
         <label for="spriteSearch">Search</label>
         <input id="spriteSearch" type="search" autocomplete="off" placeholder="Sprite name or type" />
@@ -499,6 +592,7 @@
     const countEl = document.getElementById("count");
     const fillEl = document.getElementById("fill");
     const spriteSearch = document.getElementById("spriteSearch");
+    const statusFilters = document.querySelectorAll("input[name='statusFilter']");
     const siteCounter = document.getElementById("siteCounter");
     const siteCounterImage = document.getElementById("siteCounterImage");
     const checks = [];
@@ -554,6 +648,7 @@
         const nextState = STATES[(currentIndex + 1) % STATES.length];
         updateSpriteState(card, nextState);
         updateProgress();
+        applyFilters();
         scheduleSave();
       });
       return card;
@@ -580,13 +675,20 @@
 
     document.querySelectorAll(".sprite-card").forEach(registerCard);
 
-    function applySearch() {
+    function currentStatusFilter() {
+      return document.querySelector("input[name='statusFilter']:checked")?.value || "all";
+    }
+
+    function applyFilters() {
       const query = (spriteSearch?.value || "").trim().toLowerCase();
+      const statusFilter = currentStatusFilter();
       document.querySelectorAll(".sprite-group").forEach(group => {
         let visibleCount = 0;
         group.querySelectorAll(".sprite-card").forEach(card => {
           const haystack = `${card.dataset.name || ""} ${group.dataset.family || ""}`.toLowerCase();
-          const isVisible = !query || haystack.includes(query);
+          const matchesSearch = !query || haystack.includes(query);
+          const matchesStatus = statusFilter === "all" || card.dataset.state === statusFilter;
+          const isVisible = matchesSearch && matchesStatus;
           card.hidden = !isVisible;
           if (isVisible) visibleCount += 1;
         });
@@ -594,7 +696,8 @@
       });
     }
 
-    if (spriteSearch) spriteSearch.addEventListener("input", applySearch);
+    if (spriteSearch) spriteSearch.addEventListener("input", applyFilters);
+    statusFilters.forEach(filter => filter.addEventListener("change", applyFilters));
 
     function normalizeState(value) {
       if (value === true) return "found";
@@ -639,6 +742,7 @@
       const checked = data && data.checked ? data.checked : data || {};
       checks.forEach(c => updateSpriteState(c, stateForCard(c, states, checked)));
       updateProgress();
+      applyFilters();
     }
 
     function updateProgress() {
