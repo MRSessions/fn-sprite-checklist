@@ -656,7 +656,7 @@
       card.dataset.state = "not-found";
       card.innerHTML = `
         <span class="sprite-state" aria-hidden="true"></span>
-        <span class="sprite-art"><img src="${sprite.src}" ${isEagerImage ? `loading="eager" fetchpriority="high"` : `loading="lazy" fetchpriority="low"`} alt="" decoding="async" width="300" height="300"></span>
+        <span class="sprite-art"><img src="${sprite.src}" ${isEagerImage ? `loading="eager" fetchpriority="high"` : `loading="lazy" fetchpriority="low"`} alt="" decoding="async" width="150" height="150"></span>
         <span class="sprite-name">${sprite.name}</span>
       `;
       updateSpriteState(card, "not-found");
