@@ -600,10 +600,8 @@
     const siteCounter = document.getElementById("siteCounter");
     const siteCounterImage = document.getElementById("siteCounterImage");
     const checks = [];
-    const lazyImages = new Set();
     let dirHandle = null;
     let saveTimer = null;
-    let imageObserver = null;
 
     function trackerTarget() {
       if (!location.hostname) return FALLBACK_TRACKER_TARGET;
@@ -643,27 +641,6 @@
 
     function slug(s) { return s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, ""); }
 
-    function loadSpriteImage(img) {
-      if (!img || !img.dataset.src) return;
-      img.src = img.dataset.src;
-      img.removeAttribute("data-src");
-      lazyImages.delete(img);
-      if (imageObserver) imageObserver.unobserve(img);
-    }
-
-    function observeLazyImage(img) {
-      lazyImages.add(img);
-      if (imageObserver) imageObserver.observe(img);
-    }
-
-    if ("IntersectionObserver" in window) {
-      imageObserver = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) loadSpriteImage(entry.target);
-        });
-      }, { rootMargin: "400px 0px" });
-    }
-
     function createSpriteCard(sprite, index) {
       const card = document.createElement("button");
       const isEagerImage = index < EAGER_IMAGE_COUNT;
@@ -674,10 +651,9 @@
       card.dataset.state = "not-found";
       card.innerHTML = `
         <span class="sprite-state" aria-hidden="true"></span>
-        <span class="sprite-art"><img ${isEagerImage ? `src="${sprite.src}" loading="eager" fetchpriority="high"` : `data-src="${sprite.src}" loading="lazy" fetchpriority="low"`} alt="" decoding="async" width="512" height="512"></span>
+        <span class="sprite-art"><img src="${sprite.src}" ${isEagerImage ? `loading="eager" fetchpriority="high"` : `loading="lazy" fetchpriority="low"`} alt="" decoding="async" width="300" height="300"></span>
         <span class="sprite-name">${sprite.name}</span>
       `;
-      if (!isEagerImage) observeLazyImage(card.querySelector("img"));
       updateSpriteState(card, "not-found");
       card.addEventListener("click", () => {
         const currentIndex = STATES.indexOf(card.dataset.state);
@@ -704,8 +680,6 @@
       groupSprites.forEach(sprite => groupGrid.appendChild(createSpriteCard(sprite, sprites.indexOf(sprite))));
       spriteGroups.appendChild(group);
     }
-
-    if (!imageObserver) lazyImages.forEach(loadSpriteImage);
 
     function registerCard(card) {
       checks.push(card);
