@@ -92,7 +92,7 @@
       justify-content: flex-end;
       padding-top: 26px;
     }
-    button, label.file-button {
+    button {
       border: 0;
       border-radius: 999px;
       min-height: 36px;
@@ -106,7 +106,6 @@
       font-size: 14px;
       font-family: inherit;
     }
-    label.file-button,
     button.action-button {
       display: inline-flex;
       align-items: center;
@@ -123,8 +122,13 @@
       stroke-linejoin: round;
       flex: 0 0 auto;
     }
-    button:hover, label.file-button:hover { transform: translateY(-1px); filter: brightness(1.08); }
-    button.secondary, label.file-button.secondary { background: #f4f6f8; box-shadow: none; }
+    button:hover { transform: translateY(-1px); filter: brightness(1.08); }
+    button:focus-visible,
+    .site-counter:focus-visible {
+      outline: 4px solid var(--yellow);
+      outline-offset: 3px;
+    }
+    button.secondary { background: #f4f6f8; box-shadow: none; }
     button.danger { background: var(--red); color: #061018; box-shadow: none; }
     input[type="file"] { display: none; }
     .overview {
@@ -522,17 +526,17 @@
           <svg class="action-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v10"></path><path d="m8 9 4 4 4-4"></path><path d="M5 17v2a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-2"></path></svg>
           <span>Export</span>
         </button>
-        <label class="file-button secondary" for="importFile" title="Import list">
+        <button id="importFileButton" class="action-button secondary" type="button" title="Import list">
           <svg class="action-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21V11"></path><path d="m8 15 4-4 4 4"></path><path d="M5 7V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v2"></path></svg>
           <span>Import</span>
-        </label>
+        </button>
         <input id="importFile" type="file" accept="application/json,.json" />
         <button id="resetAll" class="action-button danger" type="button" title="Reset list">
           <svg class="action-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"></path><path d="M3 3v6h6"></path></svg>
           <span>Reset</span>
         </button>
       </div>
-      <div id="status" class="status">Progress saves automatically in this browser.</div>
+      <div id="status" class="status" role="status" aria-live="polite">Progress saves automatically in this browser.</div>
     </section>
 
     <section class="overview" aria-label="Checklist overview">
@@ -892,6 +896,10 @@
       a.click();
       URL.revokeObjectURL(a.href);
       setStatus(`Exported <b>${SAVE_NAME}</b>. Share or keep this file as a backup, then use <b>Import list</b> to reload it.`);
+    });
+
+    onOptional("importFileButton", "click", () => {
+      document.getElementById("importFile")?.click();
     });
 
     onOptional("importFile", "change", async (event) => {
