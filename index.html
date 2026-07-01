@@ -16,16 +16,19 @@
     * { box-sizing: border-box; }
     :root {
       color-scheme: dark;
-      --panel: rgba(8, 16, 26, 0.86);
-      --panel-strong: rgba(10, 22, 36, 0.96);
-      --line: rgba(255,255,255,.12);
+      --bg: #061b20;
+      --panel: #070d1c;
+      --panel-strong: #0b1424;
+      --tile: #242c3b;
+      --line: rgba(144, 224, 232, .14);
       --text: #f4fbff;
-      --muted: #b9d5e8;
-      --cyan: #00d7df;
-      --green: #57ff7a;
-      --yellow: #ffe45d;
-      --red: #ff5c7a;
-      --shadow: 0 18px 60px rgba(0,0,0,.45);
+      --muted: #a9c3cf;
+      --faint: #78909d;
+      --cyan: #66eaf3;
+      --green: #a9fb67;
+      --yellow: #dfffa8;
+      --red: #ff637d;
+      --shadow: 0 18px 48px rgba(0,0,0,.28);
     }
     body {
       margin: 0;
@@ -37,86 +40,219 @@
         radial-gradient(circle at top right, rgba(87,255,122,.12), transparent 32rem),
         linear-gradient(145deg, #07101a, #102130 52%, #05090f);
       color: var(--text);
-      padding: 18px;
+      padding: 10px 6px 18px;
       overflow-x: hidden;
     }
     .app {
       width: min(100%, 1180px);
       display: grid;
-      gap: 14px;
+      gap: 16px;
       margin: 0 auto;
     }
     .toolbar {
       display: flex;
       flex-wrap: wrap;
-      align-items: center;
+      align-items: flex-start;
       justify-content: space-between;
-      gap: 12px;
-      padding: 12px 14px;
+      gap: 18px;
+      padding: 16px;
       background: var(--panel);
       border: 1px solid var(--line);
-      border-radius: 16px;
+      border-radius: 22px;
       box-shadow: var(--shadow);
-      backdrop-filter: blur(10px);
     }
-    .title { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-    h1 { margin: 0; font-size: clamp(18px, 3vw, 28px); letter-spacing: .03em; }
-    .subtitle { color: var(--muted); font-size: 13px; overflow-wrap: anywhere; }
-    .actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+    .title {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      min-width: min(100%, 420px);
+    }
+    h1 {
+      margin: 0;
+      font-size: clamp(26px, 4vw, 33px);
+      line-height: 1.05;
+      letter-spacing: 0;
+    }
+    .subtitle,
+    .status {
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.35;
+      overflow-wrap: anywhere;
+    }
+    .status {
+      width: 100%;
+      margin-top: 12px;
+    }
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      justify-content: flex-end;
+      padding-top: 26px;
+    }
     button, label.file-button {
       border: 0;
       border-radius: 999px;
-      padding: 9px 13px;
+      min-height: 36px;
+      padding: 0 14px;
       font-weight: 800;
       color: #061018;
       background: var(--cyan);
       cursor: pointer;
-      box-shadow: 0 8px 22px rgba(0, 215, 223, .22);
+      box-shadow: none;
       transition: transform .12s ease, filter .12s ease;
-      font-size: 13px;
+      font-size: 14px;
       font-family: inherit;
     }
+    label.file-button,
+    button.action-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .action-icon {
+      width: 16px;
+      height: 16px;
+      stroke: currentColor;
+      stroke-width: 2.4;
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      flex: 0 0 auto;
+    }
     button:hover, label.file-button:hover { transform: translateY(-1px); filter: brightness(1.08); }
-    button.secondary, label.file-button.secondary { background: #d9e8f4; box-shadow: none; }
+    button.secondary, label.file-button.secondary { background: #f4f6f8; box-shadow: none; }
     button.danger { background: var(--red); color: white; box-shadow: none; }
     input[type="file"] { display: none; }
-    .status {
-      width: 100%;
-      color: #cfeeff;
-      font-size: 13px;
-      line-height: 1.35;
-    }
-    .progress {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-      padding: 10px 14px;
+    .overview {
+      display: grid;
+      gap: 16px;
+      padding: 16px;
       background: var(--panel);
-      border-radius: 16px;
       border: 1px solid var(--line);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+    }
+    .overview-controls {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(172px, auto);
+      gap: 12px;
+      align-items: center;
+    }
+    .search {
+      position: relative;
+      min-width: 0;
+    }
+    .search svg {
+      position: absolute;
+      left: 17px;
+      top: 50%;
+      width: 19px;
+      height: 19px;
+      color: #9beefe;
+      transform: translateY(-50%);
+      pointer-events: none;
+    }
+    .search label { position: absolute; inline-size: 1px; block-size: 1px; overflow: hidden; clip-path: inset(50%); }
+    .search input,
+    .status-select {
+      width: 100%;
+      min-width: 0;
+      height: 46px;
+      border: 1px solid rgba(144,224,232,.15);
+      border-radius: 17px;
+      color: var(--text);
+      background: #050b17;
+      font: inherit;
+      font-weight: 800;
+      outline: none;
+    }
+    .search input {
+      padding: 0 16px 0 48px;
+    }
+    .search input:focus,
+    .status-select:focus {
+      border-color: rgba(102,234,243,.78);
+      box-shadow: 0 0 0 3px rgba(102,234,243,.14);
+    }
+    .search input::placeholder { color: var(--faint); }
+    .status-select-wrap {
+      position: relative;
+      min-width: 176px;
+    }
+    .status-select-wrap::before {
+      content: "";
+      position: absolute;
+      left: 17px;
+      top: 50%;
+      width: 18px;
+      height: 18px;
+      transform: translateY(-50%);
+      background: currentColor;
+      color: #9beefe;
+      clip-path: polygon(8% 10%, 92% 10%, 60% 48%, 60% 90%, 40% 78%, 40% 48%);
+      pointer-events: none;
+    }
+    .status-select {
+      appearance: none;
+      padding: 0 38px 0 44px;
+      cursor: pointer;
+    }
+    .status-select-wrap::after {
+      content: "";
+      position: absolute;
+      right: 18px;
+      top: 50%;
+      width: 7px;
+      height: 7px;
+      border-right: 2px solid var(--text);
+      border-bottom: 2px solid var(--text);
+      transform: translateY(-65%) rotate(45deg);
+      pointer-events: none;
+    }
+    .progress-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) repeat(3, 108px);
+      gap: 12px;
+      align-items: center;
     }
     .bar {
-      flex: 1;
       min-width: 0;
-      height: 14px;
+      height: 16px;
       border-radius: 999px;
       overflow: hidden;
-      background: rgba(255,255,255,.13);
+      background: #252c38;
     }
     .fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--cyan), var(--green)); transition: width .18s ease; }
-    .count { min-width: 176px; text-align: right; font-weight: 900; color: #dffcff; white-space: nowrap; }
-    .key {
+    .stat-tile {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(220px, 1fr);
-      gap: 14px;
-      align-items: center;
-      padding: 10px 14px;
-      background: var(--panel);
-      border: 1px solid var(--line);
-      border-radius: 16px;
-      color: #dffcff;
-      font-size: 13px;
-      font-weight: 800;
+      place-items: center;
+      min-height: 64px;
+      padding: 10px 12px;
+      background: var(--tile);
+      border: 1px solid rgba(255,255,255,.04);
+      border-radius: 15px;
+      color: var(--muted);
+      text-align: center;
+    }
+    .stat-value {
+      color: #a8f7ff;
+      font-size: 22px;
+      font-weight: 950;
+      line-height: 1;
+    }
+    .stat-tile:nth-child(3) .stat-value { color: var(--yellow); }
+    .stat-tile:nth-child(4) .stat-value { color: var(--text); }
+    .stat-label {
+      margin-top: 5px;
+      font-size: 14px;
+      line-height: 1;
+    }
+    .key {
+      display: none;
     }
     .key-legend {
       display: flex;
@@ -125,84 +261,6 @@
       align-items: center;
       min-width: 0;
       min-inline-size: 0;
-    }
-    .search {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      justify-self: end;
-      min-width: 0;
-      min-inline-size: 0;
-      width: min(100%, 320px);
-    }
-    .search label {
-      color: #dffcff;
-      white-space: nowrap;
-    }
-    .search input {
-      width: 100%;
-      min-width: 0;
-      height: 34px;
-      border: 1px solid rgba(255,255,255,.22);
-      border-radius: 999px;
-      padding: 0 13px;
-      color: var(--text);
-      background: rgba(2,8,14,.62);
-      font: inherit;
-      font-weight: 750;
-      outline: none;
-    }
-    .search input:focus {
-      border-color: var(--cyan);
-      box-shadow: 0 0 0 3px rgba(0,215,223,.18);
-    }
-    .search input::placeholder { color: #8fa9ba; }
-    .status-filter {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 6px;
-      min-width: 0;
-      min-inline-size: 0;
-      border: 0;
-      margin: 0;
-      padding: 0;
-    }
-    .status-filter legend {
-      float: left;
-      margin-right: 2px;
-      color: #dffcff;
-      font-weight: 800;
-      line-height: 28px;
-    }
-    .status-filter label {
-      display: inline-grid;
-      place-items: center;
-      min-height: 28px;
-      padding: 0 10px;
-      border: 1px solid rgba(255,255,255,.22);
-      border-radius: 999px;
-      color: #dffcff;
-      background: rgba(2,8,14,.46);
-      cursor: pointer;
-      user-select: none;
-    }
-    .status-filter input {
-      position: absolute;
-      inline-size: 1px;
-      block-size: 1px;
-      opacity: 0;
-      pointer-events: none;
-    }
-    .status-filter label:has(input:checked) {
-      border-color: rgba(0,215,223,.76);
-      color: #061018;
-      background: var(--cyan);
-      box-shadow: 0 8px 22px rgba(0,215,223,.18);
-    }
-    .status-filter label:has(input:focus-visible) {
-      outline: 3px solid var(--yellow);
-      outline-offset: 2px;
     }
     .key-item {
       display: inline-flex;
@@ -247,11 +305,11 @@
     }
     .sprite-group {
       display: grid;
-      gap: 10px;
-      padding: 14px;
+      gap: 14px;
+      padding: 16px;
       background: rgba(0,0,0,.16);
       border: 1px solid var(--line);
-      border-radius: 12px;
+      border-radius: 18px;
     }
     .sprite-group[hidden],
     .sprite-card[hidden] {
@@ -267,93 +325,116 @@
     }
     .sprite-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-      gap: 12px;
+      grid-template-columns: repeat(auto-fit, minmax(238px, 1fr));
+      gap: 16px;
       align-items: stretch;
     }
     .sprite-card {
       position: relative;
       display: grid;
-      grid-template-rows: 150px auto;
-      min-height: 204px;
+      grid-template-rows: 154px auto;
+      gap: 16px;
+      min-height: 256px;
       width: 100%;
-      padding: 10px;
+      padding: 16px;
       color: var(--text);
       text-align: left;
-      background: var(--panel-strong);
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      box-shadow: 0 10px 32px rgba(0,0,0,.28);
+      background: #0b1522;
+      border: 1px solid rgba(144,224,232,.16);
+      border-radius: 22px;
+      box-shadow: none;
       overflow: hidden;
     }
     .sprite-card:hover {
       transform: translateY(-2px);
       filter: none;
-      border-color: rgba(0,215,223,.42);
-      box-shadow: 0 18px 44px rgba(0,0,0,.34), 0 0 0 1px rgba(0,215,223,.12);
+      border-color: rgba(102,234,243,.48);
+      box-shadow: 0 18px 44px rgba(0,0,0,.24), 0 0 0 1px rgba(102,234,243,.08);
     }
     .sprite-card:focus-visible {
       outline: 4px solid var(--yellow);
       outline-offset: 2px;
     }
     .sprite-card.is-found {
-      border-color: rgba(80,255,125,.74);
-      background: linear-gradient(180deg, rgba(8,22,29,.96), rgba(14,52,31,.92));
+      border-color: rgba(80,255,125,.62);
+      background:
+        radial-gradient(circle at 50% 10%, rgba(80,255,125,.16), transparent 42%),
+        linear-gradient(180deg, rgba(8,22,29,.98), rgba(14,52,31,.92));
     }
     .sprite-card.is-mastered {
-      border-color: rgba(255,228,93,.78);
-      background: linear-gradient(180deg, rgba(28,24,10,.97), rgba(58,45,13,.92));
+      border-color: rgba(255,228,93,.68);
+      background:
+        radial-gradient(circle at 50% 10%, rgba(255,228,93,.18), transparent 44%),
+        linear-gradient(180deg, rgba(28,24,10,.98), rgba(58,45,13,.92));
     }
     .sprite-art {
       display: grid;
       place-items: center;
       min-height: 0;
+      padding: 10px;
+      background: #0d1b29;
+      border: 1px solid rgba(144,224,232,.14);
+      border-radius: 20px;
+    }
+    .sprite-card.is-found .sprite-art {
+      background:
+        radial-gradient(circle at center, rgba(80,255,125,.12), transparent 58%),
+        #0d1b29;
+      border-color: rgba(80,255,125,.18);
+    }
+    .sprite-card.is-mastered .sprite-art {
+      background:
+        radial-gradient(circle at center, rgba(255,228,93,.14), transparent 58%),
+        #0d1b29;
+      border-color: rgba(255,228,93,.2);
     }
     .sprite-art img {
       display: block;
-      width: min(100%, 150px);
+      width: min(100%, 132px);
       height: auto;
-      max-height: 150px;
+      max-height: 132px;
       aspect-ratio: 1 / 1;
       object-fit: contain;
       filter: drop-shadow(0 14px 18px rgba(0,0,0,.32));
       pointer-events: none;
     }
+    .sprite-info {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 12px;
+      align-items: center;
+    }
     .sprite-name {
-      min-height: 34px;
       color: #f4fbff;
-      font-size: 13px;
-      font-weight: 900;
-      line-height: 1.25;
-      text-align: center;
+      font-size: 17px;
+      font-weight: 950;
+      line-height: 1.15;
       overflow-wrap: anywhere;
     }
     .sprite-state {
-      position: absolute;
-      top: 9px;
-      right: 9px;
       display: grid;
       place-items: center;
-      width: 34px;
-      height: 34px;
-      border: 3px solid rgba(255,255,255,.38);
-      background: rgba(4,9,14,.74);
+      width: 22px;
+      height: 22px;
+      border: 2px solid #5f748c;
+      border-radius: 50%;
+      background: transparent;
       color: transparent;
-      font-size: 27px;
+      font-size: 15px;
       font-weight: 1000;
       line-height: 1;
-      box-shadow: 0 8px 22px rgba(0,0,0,.28);
+      box-shadow: none;
     }
     .sprite-card.is-found .sprite-state {
-      background: rgba(80,255,125,.92);
-      border-color: #041007;
-      color: #061018;
+      background: transparent;
+      border-color: var(--cyan);
+      color: var(--cyan);
     }
     .sprite-card.is-mastered .sprite-state {
-      background: rgba(255,228,93,.96);
-      border-color: #120d02;
-      color: #221700;
-      font-size: 25px;
+      background: transparent;
+      border-color: var(--green);
+      color: var(--green);
+      font-size: 14px;
     }
     .disclaimers {
       padding: 12px 14px;
@@ -396,46 +477,36 @@
     .site-counter img.is-hidden { display: none; }
     @media (max-width: 720px) {
       body { padding: 0; }
-      .app { width: 100vw; padding: 8px; }
-      .toolbar { border-radius: 12px; }
-      .progress { flex-wrap: wrap; }
-      .bar { flex-basis: 100%; }
-      .count { width: 100%; min-width: 0; text-align: left; }
-      .key { grid-template-columns: 1fr; gap: 10px; }
-      .key-legend {
-        display: grid;
+      .app { width: 100%; padding: 8px; }
+      .toolbar,
+      .overview { border-radius: 18px; }
+      .toolbar,
+      .overview,
+      .title { min-width: 0; }
+      .title { width: 100%; }
+      .actions {
+        width: 100%;
+        justify-content: flex-start;
+        padding-top: 0;
+      }
+      .overview-controls,
+      .progress-row { grid-template-columns: 1fr; }
+      .status-select-wrap { min-width: 0; }
+      .progress-row {
         grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 8px;
       }
-      .key-item {
-        min-width: 0;
-        gap: 6px;
-      }
-      .key-item span:last-child {
-        min-width: 0;
-        overflow-wrap: anywhere;
-      }
-      .status-filter {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 8px;
-      }
-      .status-filter legend {
-        float: none;
-        grid-column: 1 / -1;
-        margin: 0;
-        line-height: 1.2;
-      }
-      .status-filter label {
-        min-height: 34px;
-      }
-      .search { justify-self: stretch; width: 100%; margin-top: 0; }
+      .bar { grid-column: 1 / -1; }
+      .stat-tile { min-height: 58px; padding-inline: 8px; }
+      .stat-value { font-size: 20px; }
+      .stat-label { font-size: 13px; }
       .sprite-groups { gap: 14px; }
       .sprite-group { padding: 10px; gap: 8px; }
       .sprite-group-title { font-size: 16px; }
-      .sprite-grid { grid-template-columns: repeat(auto-fit, minmax(min(150px, 100%), 1fr)); gap: 8px; }
-      .sprite-card { grid-template-rows: 124px auto; min-height: 178px; padding: 8px; }
-      .sprite-art img { width: min(100%, 124px); max-height: 124px; }
+      .sprite-grid { grid-template-columns: 1fr; gap: 10px; }
+      .sprite-card { grid-template-rows: 132px auto; min-height: 222px; padding: 14px; border-radius: 18px; }
+      .sprite-art { border-radius: 16px; }
+      .sprite-art img { width: min(100%, 112px); max-height: 112px; }
+      .sprite-name { font-size: 15px; }
     }
   </style>
 </head>
@@ -444,42 +515,57 @@
     <section class="toolbar" aria-label="Checklist controls">
       <div class="title">
         <h1>Fortnite Sprite Checklist</h1>
-        <div class="subtitle">Click a sprite to cycle Not Found, Found, and Mastered. Progress saves automatically in this browser.</div>
+        <div class="subtitle">Track collected Fortnite sprites with browser-saved Not Found, Found, and Mastered progress.</div>
+        <div class="subtitle">Based on the uploaded sprites.doomedgaming.com page.</div>
       </div>
-      <!-- Save controls hidden by request. Browser localStorage autosave is always active.
       <div class="actions">
-        <button id="pickFolder" type="button" title="Choose this HTML file's folder to save/read a JSON save file there">Enable file saving</button>
-        <button id="saveNow" class="secondary" type="button">Save now</button>
-        <label class="file-button secondary" for="importFile">Import save</label>
+        <button id="exportFile" class="action-button" type="button" title="Export list">
+          <svg class="action-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v10"></path><path d="m8 9 4 4 4-4"></path><path d="M5 17v2a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-2"></path></svg>
+          <span>Export</span>
+        </button>
+        <label class="file-button secondary" for="importFile" title="Import list">
+          <svg class="action-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21V11"></path><path d="m8 15 4-4 4 4"></path><path d="M5 7V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v2"></path></svg>
+          <span>Import</span>
+        </label>
         <input id="importFile" type="file" accept="application/json,.json" />
-        <button id="exportFile" class="secondary" type="button">Download save</button>
-        <button id="resetAll" class="danger" type="button">Reset</button>
+        <button id="resetAll" class="action-button danger" type="button" title="Reset list">
+          <svg class="action-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"></path><path d="M3 3v6h6"></path></svg>
+          <span>Reset</span>
+        </button>
       </div>
-      <div id="status" class="status">Ready. Browser sandbox note: to write a real file beside this HTML, click <b>Enable file saving</b> and select the folder that contains this page. Without that, it still autosaves in this browser via localStorage.</div>
-      -->
+      <div id="status" class="status">Progress saves automatically in this browser.</div>
     </section>
 
-    <section class="progress" aria-label="Progress">
-      <div class="bar"><div id="fill" class="fill"></div></div>
-      <div id="count" class="count">0 / 61</div>
-    </section>
-
-    <section class="key" aria-label="Checklist key">
-      <div class="key-legend">
-        <div class="key-item"><span class="key-mark" aria-hidden="true"></span><span>Not Found</span></div>
-        <div class="key-item"><span class="key-mark is-found" aria-hidden="true"></span><span>Found</span></div>
-        <div class="key-item"><span class="key-mark is-mastered" aria-hidden="true"></span><span>Mastered</span></div>
+    <section class="overview" aria-label="Checklist overview">
+      <div class="overview-controls">
+        <div class="search">
+          <label for="spriteSearch">Search</label>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m21 21-4.35-4.35" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"></path><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2.4"></circle></svg>
+          <input id="spriteSearch" type="search" autocomplete="off" placeholder="Search sprites..." />
+        </div>
+        <div class="status-select-wrap">
+          <select id="statusFilter" class="status-select" aria-label="Filter by sprite status">
+            <option value="all">All statuses</option>
+            <option value="not-found">Not Found</option>
+            <option value="found">Found</option>
+            <option value="mastered">Mastered</option>
+          </select>
+        </div>
       </div>
-      <fieldset class="status-filter" aria-label="Filter by sprite status">
-        <legend>Show</legend>
-        <label><input type="radio" name="statusFilter" value="all" checked>All</label>
-        <label><input type="radio" name="statusFilter" value="not-found">Not Found</label>
-        <label><input type="radio" name="statusFilter" value="found">Found</label>
-        <label><input type="radio" name="statusFilter" value="mastered">Mastered</label>
-      </fieldset>
-      <div class="search">
-        <label for="spriteSearch">Search</label>
-        <input id="spriteSearch" type="search" autocomplete="off" placeholder="Sprite name or type" />
+      <div class="progress-row">
+        <div class="bar" aria-hidden="true"><div id="fill" class="fill"></div></div>
+        <div class="stat-tile">
+          <div id="collectedCount" class="stat-value">0</div>
+          <div class="stat-label">Collected</div>
+        </div>
+        <div class="stat-tile">
+          <div id="masteredCount" class="stat-value">0</div>
+          <div class="stat-label">Mastered</div>
+        </div>
+        <div class="stat-tile">
+          <div id="percentDone" class="stat-value">0%</div>
+          <div class="stat-label">Done</div>
+        </div>
       </div>
     </section>
 
@@ -598,14 +684,15 @@
 
     const spriteGroups = document.getElementById("spriteGroups");
     const statusEl = document.getElementById("status");
-    const countEl = document.getElementById("count");
+    const collectedCountEl = document.getElementById("collectedCount");
+    const masteredCountEl = document.getElementById("masteredCount");
+    const percentDoneEl = document.getElementById("percentDone");
     const fillEl = document.getElementById("fill");
     const spriteSearch = document.getElementById("spriteSearch");
-    const statusFilters = document.querySelectorAll("input[name='statusFilter']");
+    const statusFilter = document.getElementById("statusFilter");
     const siteCounter = document.getElementById("siteCounter");
     const siteCounterImage = document.getElementById("siteCounterImage");
     const checks = [];
-    let dirHandle = null;
     let saveTimer = null;
 
     function trackerTarget() {
@@ -655,9 +742,11 @@
       card.dataset.name = sprite.name;
       card.dataset.state = "not-found";
       card.innerHTML = `
-        <span class="sprite-state" aria-hidden="true"></span>
         <span class="sprite-art"><img src="${sprite.src}" ${isEagerImage ? `loading="eager" fetchpriority="high"` : `loading="lazy" fetchpriority="low"`} alt="" decoding="async" width="150" height="150"></span>
-        <span class="sprite-name">${sprite.name}</span>
+        <span class="sprite-info">
+          <span class="sprite-name">${sprite.name}</span>
+          <span class="sprite-state" aria-hidden="true"></span>
+        </span>
       `;
       updateSpriteState(card, "not-found");
       card.addEventListener("click", () => {
@@ -693,7 +782,7 @@
     document.querySelectorAll(".sprite-card").forEach(registerCard);
 
     function currentStatusFilter() {
-      return document.querySelector("input[name='statusFilter']:checked")?.value || "all";
+      return statusFilter?.value || "all";
     }
 
     function applyFilters() {
@@ -714,7 +803,7 @@
     }
 
     if (spriteSearch) spriteSearch.addEventListener("input", applyFilters);
-    statusFilters.forEach(filter => filter.addEventListener("change", applyFilters));
+    if (statusFilter) statusFilter.addEventListener("change", applyFilters);
 
     function normalizeState(value) {
       if (value === true) return "found";
@@ -766,8 +855,11 @@
       const done = checks.filter(c => c.dataset.state !== "not-found").length;
       const mastered = checks.filter(c => c.dataset.state === "mastered").length;
       const total = checks.length;
-      countEl.textContent = mastered > 0 ? `${done} / ${total} · ${mastered} mastered` : `${done} / ${total}`;
-      fillEl.style.width = `${Math.round((done / total) * 100)}%`;
+      const percent = total > 0 ? Math.round((done / total) * 100) : 0;
+      collectedCountEl.textContent = done;
+      masteredCountEl.textContent = mastered;
+      percentDoneEl.textContent = `${percent}%`;
+      fillEl.style.width = `${percent}%`;
     }
 
     function setStatus(message, isError = false) {
@@ -785,69 +877,13 @@
       localStorage.setItem(LS_KEY, JSON.stringify(currentData(), null, 2));
     }
 
-    async function saveToFile() {
-      saveLocal();
-      if (!dirHandle) return false;
-      const fileHandle = await dirHandle.getFileHandle(SAVE_NAME, { create: true });
-      const writable = await fileHandle.createWritable();
-      await writable.write(JSON.stringify(currentData(), null, 2));
-      await writable.close();
-      setStatus(`Saved to <b>${SAVE_NAME}</b> and browser localStorage.`);
-      return true;
-    }
-
     function scheduleSave() {
       saveLocal();
       clearTimeout(saveTimer);
-      saveTimer = setTimeout(async () => {
-        try {
-          if (dirHandle) await saveToFile();
-          else setStatus(`Autosaved in this browser. Click <b>Enable file saving</b> to also write <b>${SAVE_NAME}</b> beside the HTML.`);
-        } catch (err) {
-          setStatus(`Could not write save file: ${err.message}. Browser localStorage save is still updated.`, true);
-        }
+      saveTimer = setTimeout(() => {
+        setStatus(`Autosaved in this browser. Use <b>Export list</b> to download a shareable JSON backup.`);
       }, 250);
     }
-
-    async function loadFromDir() {
-      try {
-        const fileHandle = await dirHandle.getFileHandle(SAVE_NAME, { create: false });
-        const file = await fileHandle.getFile();
-        const data = JSON.parse(await file.text());
-        applyData(data);
-        saveLocal();
-        setStatus(`Loaded existing <b>${SAVE_NAME}</b>. Future checks will save back to that file.`);
-      } catch (err) {
-        if (err.name === "NotFoundError") {
-          await saveToFile();
-          setStatus(`No existing save found, so I created <b>${SAVE_NAME}</b> in the selected folder.`);
-        } else {
-          throw err;
-        }
-      }
-    }
-
-    onOptional("pickFolder", "click", async () => {
-      if (!window.showDirectoryPicker) {
-        setStatus("This browser does not support direct folder saving. Use <b>Download save</b> instead, or open this page in Chrome/Edge.", true);
-        return;
-      }
-      try {
-        dirHandle = await window.showDirectoryPicker({ mode: "readwrite" });
-        await loadFromDir();
-      } catch (err) {
-        if (err.name !== "AbortError") setStatus(`Folder access failed: ${err.message}`, true);
-      }
-    });
-
-    onOptional("saveNow", "click", async () => {
-      try {
-        const wrote = await saveToFile();
-        if (!wrote) setStatus(`Saved to browser localStorage. To save an actual file, click <b>Enable file saving</b> first.`);
-      } catch (err) {
-        setStatus(`Save failed: ${err.message}`, true);
-      }
-    });
 
     onOptional("exportFile", "click", () => {
       const blob = new Blob([JSON.stringify(currentData(), null, 2)], { type: "application/json" });
@@ -856,7 +892,7 @@
       a.download = SAVE_NAME;
       a.click();
       URL.revokeObjectURL(a.href);
-      setStatus(`Downloaded <b>${SAVE_NAME}</b>. Put it next to this HTML if you want to keep the files together.`);
+      setStatus(`Exported <b>${SAVE_NAME}</b>. Share or keep this file as a backup, then use <b>Import list</b> to reload it.`);
     });
 
     onOptional("importFile", "change", async (event) => {
@@ -865,8 +901,8 @@
       try {
         const data = JSON.parse(await file.text());
         applyData(data);
-        await saveToFile();
-        setStatus(`Imported <b>${file.name}</b> and saved current state.`);
+        saveLocal();
+        setStatus(`Imported <b>${file.name}</b> and saved current state in this browser.`);
       } catch (err) {
         setStatus(`Import failed: ${err.message}`, true);
       } finally {
@@ -886,7 +922,7 @@
       if (saved) {
         applyData(JSON.parse(saved));
         saveLocal();
-        setStatus(`Loaded browser autosave. Click <b>Enable file saving</b> to read/write <b>${SAVE_NAME}</b> in this folder.`);
+        setStatus(`Loaded browser autosave. Use <b>Export list</b> to download a shareable JSON backup.`);
       } else {
         updateProgress();
       }

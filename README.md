@@ -13,12 +13,14 @@ Keep `index.html` and the `sprites/` folder together. The HTML references the sp
 ## Saving progress
 
 Progress is saved automatically in the user's browser using `localStorage`.
+Users can also export a JSON backup from the page and import that JSON file later to reload or share a checklist.
 
 The current page uses the same save key as the previous image-overlay checklist and maps older sprite IDs into the new individual sprite cards where the sprite still exists.
 
 Important notes:
 
 - Saves are local to the browser and device being used.
+- Exported JSON files can be moved between browsers or devices and reloaded with **Import list**.
 - Clearing browser cache/site data may delete saved progress.
 - Opening the page from a different domain, browser, device, or file path may use a separate save slot.
 - No account login or cloud sync is included.
