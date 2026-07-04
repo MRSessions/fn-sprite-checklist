@@ -9,6 +9,7 @@
   <meta property="og:description" content="Track collected Fortnite sprites with a browser-saved checklist for Not Found, Found, and Mastered progress." />
   <meta property="og:type" content="website" />
   <meta name="twitter:card" content="summary" />
+  <meta name="theme-color" content="#07101a" />
   <link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="12" fill="%2307101a"/><circle cx="32" cy="32" r="21" fill="%2300d7df"/><path d="M22 34l7 7 15-18" fill="none" stroke="%23061018" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg>' />
   <link rel="preload" as="image" href="sprites/water-sprite.webp" fetchpriority="high" />
   <link rel="preload" as="image" href="sprites/gold-water-sprite.webp" fetchpriority="high" />
@@ -753,6 +754,20 @@
         grid-template-columns: repeat(4, minmax(0, 1fr));
       }
     }
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        transition-duration: .01ms !important;
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+      }
+      button:hover,
+      .sprite-card:hover {
+        transform: none;
+      }
+    }
   </style>
 </head>
 <body>
@@ -832,12 +847,12 @@
     <section class="disclaimers" aria-label="Disclaimer and copyright">
       <p><strong>Save notice:</strong> Progress is saved in this browser's local storage. Existing progress from the previous checklist is mapped into this sprite grid where the sprite still exists.</p>
       <p><strong>Artwork disclaimer:</strong> Fortnite and related artwork are property of Epic Games, Inc. This fan-made checklist is not affiliated with, endorsed by, sponsored by, or approved by Epic Games, Inc.</p>
-      <p><strong>Sprite image source:</strong> Local sprite images were sourced from <a href="https://fortnite.gg/sprites" target="_blank" rel="noopener">Fortnite.GG sprites</a>.</p>
+      <p><strong>Sprite image source:</strong> Local sprite images were sourced from <a href="https://fortnite.gg/sprites" target="_blank" rel="noopener noreferrer">Fortnite.GG sprites</a>.</p>
       <p><strong>© Doomed Gaming</strong></p>
     </section>
 
     <footer class="site-footer" aria-label="Site footer">
-      <a id="siteCounter" class="site-counter" href="https://hits.sh/sprites.doomedgaming.com/" target="_blank" rel="noopener" aria-label="Site visit counter">
+      <a id="siteCounter" class="site-counter" href="https://hits.sh/sprites.doomedgaming.com/" target="_blank" rel="noopener noreferrer" aria-label="Site visit counter">
         <span id="siteCounterFallback" hidden>Visitor counter loading</span>
         <img id="siteCounterImage" alt="Site visits" width="74" height="20" />
       </a>
@@ -1173,14 +1188,24 @@
         compactModeButton.setAttribute("aria-pressed", String(enabled));
         compactModeButton.title = enabled ? "Disable compact screenshot mode" : "Enable compact screenshot mode";
       }
-      if (shouldSave) localStorage.setItem(COMPACT_LS_KEY, enabled ? "1" : "0");
+      if (shouldSave) {
+        try {
+          localStorage.setItem(COMPACT_LS_KEY, enabled ? "1" : "0");
+        } catch {
+          // Compact mode can still work for the current page even if storage is unavailable.
+        }
+      }
     }
 
     if (compactModeButton) {
       compactModeButton.addEventListener("click", () => {
         setCompactMode(!document.body.classList.contains("compact-mode"));
       });
-      setCompactMode(localStorage.getItem(COMPACT_LS_KEY) === "1", false);
+      try {
+        setCompactMode(localStorage.getItem(COMPACT_LS_KEY) === "1", false);
+      } catch {
+        setCompactMode(false, false);
+      }
     }
 
     function normalizeState(value) {
@@ -1227,6 +1252,10 @@
       checks.forEach(c => updateSpriteState(c, stateForCard(c, states, checked)));
       updateProgress();
       applyFilters();
+    }
+
+    function isImportData(data) {
+      return data && typeof data === "object" && !Array.isArray(data);
     }
 
     function updateProgress() {
@@ -1323,6 +1352,7 @@
       if (!file) return;
       try {
         const data = JSON.parse(await file.text());
+        if (!isImportData(data)) throw new Error("Backup file must contain a checklist object.");
         applyData(data);
         if (saveLocal()) {
           const counts = progressCounts();
