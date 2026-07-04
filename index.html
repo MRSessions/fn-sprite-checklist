@@ -129,6 +129,10 @@
       outline-offset: 3px;
     }
     button.secondary { background: #f4f6f8; box-shadow: none; }
+    button.is-active {
+      background: var(--green);
+      color: #061018;
+    }
     button.danger { background: var(--red); color: #061018; box-shadow: none; }
     input[type="file"] { display: none; }
     .overview {
@@ -479,6 +483,169 @@
     }
     .site-counter img:not([src]),
     .site-counter img.is-hidden { display: none; }
+    body.compact-mode {
+      padding: 6px;
+    }
+    body.compact-mode .app {
+      width: min(100%, 1180px);
+      gap: 8px;
+    }
+    body.compact-mode .toolbar,
+    body.compact-mode .overview,
+    body.compact-mode .sprite-group {
+      border-radius: 10px;
+      box-shadow: none;
+    }
+    body.compact-mode .toolbar {
+      align-items: center;
+      gap: 8px;
+      padding: 8px;
+    }
+    body.compact-mode .title {
+      gap: 0;
+      min-width: 0;
+    }
+    body.compact-mode h1 {
+      font-size: 20px;
+      line-height: 1.1;
+    }
+    body.compact-mode .subtitle,
+    body.compact-mode .status,
+    body.compact-mode .disclaimers,
+    body.compact-mode .site-footer {
+      display: none;
+    }
+    body.compact-mode .actions {
+      gap: 6px;
+      padding-top: 0;
+    }
+    body.compact-mode button {
+      min-height: 30px;
+      padding-inline: 10px;
+      font-size: 12px;
+    }
+    body.compact-mode .action-icon {
+      width: 14px;
+      height: 14px;
+    }
+    body.compact-mode .overview {
+      gap: 8px;
+      padding: 8px;
+    }
+    body.compact-mode .overview-controls {
+      grid-template-columns: minmax(0, 1fr) 148px;
+      gap: 8px;
+    }
+    body.compact-mode .search input,
+    body.compact-mode .status-select {
+      height: 34px;
+      border-radius: 9px;
+      font-size: 13px;
+    }
+    body.compact-mode .search svg {
+      left: 11px;
+      width: 15px;
+      height: 15px;
+    }
+    body.compact-mode .search input {
+      padding-left: 34px;
+    }
+    body.compact-mode .status-select-wrap {
+      min-width: 0;
+    }
+    body.compact-mode .status-select-wrap::before {
+      left: 11px;
+      width: 14px;
+      height: 14px;
+    }
+    body.compact-mode .status-select {
+      padding-left: 32px;
+      padding-right: 28px;
+    }
+    body.compact-mode .status-select-wrap::after {
+      right: 12px;
+    }
+    body.compact-mode .progress-row {
+      grid-template-columns: minmax(0, 1fr) repeat(3, 74px);
+      gap: 8px;
+    }
+    body.compact-mode .bar {
+      height: 10px;
+    }
+    body.compact-mode .stat-tile {
+      min-height: 40px;
+      padding: 6px;
+      border-radius: 8px;
+    }
+    body.compact-mode .stat-value {
+      font-size: 16px;
+    }
+    body.compact-mode .stat-label {
+      margin-top: 3px;
+      font-size: 10px;
+    }
+    body.compact-mode .sprite-groups {
+      gap: 8px;
+      grid-template-columns: repeat(auto-fill, 289px);
+      align-items: start;
+      justify-content: start;
+    }
+    body.compact-mode .sprite-group {
+      gap: 7px;
+      padding: 8px;
+    }
+    body.compact-mode .sprite-group-title {
+      font-size: 13px;
+    }
+    body.compact-mode .sprite-grid {
+      grid-template-columns: repeat(auto-fill, 64px);
+      gap: 5px;
+      justify-content: start;
+    }
+    body.compact-mode .sprite-card {
+      grid-template-rows: 46px 24px;
+      gap: 4px;
+      height: 84px;
+      min-height: 84px;
+      padding: 5px;
+      border-radius: 8px;
+    }
+    body.compact-mode .sprite-card:hover {
+      transform: none;
+      box-shadow: none;
+    }
+    body.compact-mode .sprite-art {
+      padding: 3px;
+      border-radius: 7px;
+    }
+    body.compact-mode .sprite-art img {
+      width: min(100%, 36px);
+      max-height: 36px;
+      filter: drop-shadow(0 5px 7px rgba(0,0,0,.24));
+    }
+    body.compact-mode .sprite-info {
+      min-height: 0;
+      gap: 6px;
+      align-items: start;
+    }
+    body.compact-mode .sprite-name {
+      display: -webkit-box;
+      min-height: 22px;
+      overflow: hidden;
+      font-size: 9px;
+      line-height: 1.08;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+    }
+    body.compact-mode .sprite-state {
+      width: 15px;
+      height: 15px;
+      font-size: 10px;
+      border-width: 2px;
+    }
+    body.compact-mode .sprite-card.is-mastered .sprite-state {
+      font-size: 10px;
+    }
     @media (max-width: 720px) {
       body { padding: 0; }
       .app { width: 100%; padding: 8px; }
@@ -511,6 +678,20 @@
       .sprite-art { border-radius: 16px; }
       .sprite-art img { width: min(100%, 112px); max-height: 112px; }
       .sprite-name { font-size: 15px; }
+      body.compact-mode { padding: 4px; }
+      body.compact-mode .app { padding: 0; }
+      body.compact-mode .toolbar { align-items: flex-start; }
+      body.compact-mode .actions { width: 100%; }
+      body.compact-mode .overview-controls,
+      body.compact-mode .progress-row { grid-template-columns: 1fr; }
+      body.compact-mode .progress-row {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+      body.compact-mode .bar { grid-column: 1 / -1; }
+      body.compact-mode .sprite-groups { grid-template-columns: 1fr; }
+      body.compact-mode .sprite-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
     }
   </style>
 </head>
@@ -531,6 +712,10 @@
           <span>Import</span>
         </button>
         <input id="importFile" type="file" accept="application/json,.json" />
+        <button id="compactMode" class="action-button secondary" type="button" title="Toggle compact screenshot mode" aria-pressed="false">
+          <svg class="action-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3v5H3"></path><path d="M16 3v5h5"></path><path d="M8 21v-5H3"></path><path d="M16 21v-5h5"></path></svg>
+          <span>Compact</span>
+        </button>
         <button id="resetAll" class="action-button danger" type="button" title="Reset list">
           <svg class="action-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"></path><path d="M3 3v6h6"></path></svg>
           <span>Reset</span>
@@ -592,6 +777,7 @@
   <script>
     const SAVE_NAME = "fortnite-sprite-checklist-save.json";
     const LS_KEY = "fortnite-sprite-checklist:v1";
+    const COMPACT_LS_KEY = "fortnite-sprite-checklist:compact-mode";
     const FALLBACK_TRACKER_TARGET = "sprites.doomedgaming.com";
     const EAGER_IMAGE_COUNT = 2;
     const STATES = ["not-found", "found", "mastered"];
@@ -693,6 +879,7 @@
     const fillEl = document.getElementById("fill");
     const spriteSearch = document.getElementById("spriteSearch");
     const statusFilter = document.getElementById("statusFilter");
+    const compactModeButton = document.getElementById("compactMode");
     const siteCounter = document.getElementById("siteCounter");
     const siteCounterImage = document.getElementById("siteCounterImage");
     const checks = [];
@@ -807,6 +994,23 @@
 
     if (spriteSearch) spriteSearch.addEventListener("input", applyFilters);
     if (statusFilter) statusFilter.addEventListener("change", applyFilters);
+
+    function setCompactMode(enabled, shouldSave = true) {
+      document.body.classList.toggle("compact-mode", enabled);
+      if (compactModeButton) {
+        compactModeButton.classList.toggle("is-active", enabled);
+        compactModeButton.setAttribute("aria-pressed", String(enabled));
+        compactModeButton.title = enabled ? "Disable compact screenshot mode" : "Enable compact screenshot mode";
+      }
+      if (shouldSave) localStorage.setItem(COMPACT_LS_KEY, enabled ? "1" : "0");
+    }
+
+    if (compactModeButton) {
+      compactModeButton.addEventListener("click", () => {
+        setCompactMode(!document.body.classList.contains("compact-mode"));
+      });
+      setCompactMode(localStorage.getItem(COMPACT_LS_KEY) === "1", false);
+    }
 
     function normalizeState(value) {
       if (value === true) return "found";
