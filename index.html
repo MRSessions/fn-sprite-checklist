@@ -223,7 +223,7 @@
     }
     .progress-row {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) repeat(3, 108px);
+      grid-template-columns: minmax(0, 1fr) repeat(4, 108px);
       gap: 12px;
       align-items: center;
     }
@@ -246,6 +246,20 @@
       color: var(--muted);
       text-align: center;
     }
+    button.stat-tile {
+      border-radius: 15px;
+      font: inherit;
+    }
+    button.stat-tile:hover {
+      filter: none;
+      border-color: rgba(102,234,243,.48);
+      transform: translateY(-1px);
+    }
+    button.stat-tile.is-active {
+      background: #314056;
+      border-color: rgba(102,234,243,.7);
+      color: var(--text);
+    }
     .stat-value {
       color: #a8f7ff;
       font-size: 22px;
@@ -253,7 +267,8 @@
       line-height: 1;
     }
     .stat-tile:nth-child(3) .stat-value { color: var(--yellow); }
-    .stat-tile:nth-child(4) .stat-value { color: var(--text); }
+    .stat-tile:nth-child(4) .stat-value { color: var(--red); }
+    .stat-tile:nth-child(5) .stat-value { color: var(--text); }
     .stat-label {
       margin-top: 5px;
       font-size: 14px;
@@ -586,7 +601,7 @@
       right: 12px;
     }
     body.compact-mode .progress-row {
-      grid-template-columns: minmax(0, 1fr) repeat(3, 74px);
+      grid-template-columns: minmax(0, 1fr) repeat(4, 74px);
       gap: 8px;
     }
     body.compact-mode .bar {
@@ -684,7 +699,7 @@
       .progress-row { grid-template-columns: 1fr; }
       .status-select-wrap { min-width: 0; }
       .progress-row {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
+        grid-template-columns: repeat(4, minmax(0, 1fr));
       }
       .bar { grid-column: 1 / -1; }
       .stat-tile { min-height: 58px; padding-inline: 8px; }
@@ -705,7 +720,7 @@
       body.compact-mode .overview-controls,
       body.compact-mode .progress-row { grid-template-columns: 1fr; }
       body.compact-mode .progress-row {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
+        grid-template-columns: repeat(4, minmax(0, 1fr));
       }
       body.compact-mode .bar { grid-column: 1 / -1; }
       body.compact-mode .sprite-groups { grid-template-columns: 1fr; }
@@ -754,6 +769,7 @@
         <div class="status-select-wrap">
           <select id="statusFilter" class="status-select" aria-label="Filter by sprite status">
             <option value="all">All statuses</option>
+            <option value="collected">Collected</option>
             <option value="not-found">Not Found</option>
             <option value="found">Found</option>
             <option value="mastered">Mastered</option>
@@ -761,19 +777,23 @@
         </div>
       </div>
       <div class="progress-row">
-        <div class="bar" aria-hidden="true"><div id="fill" class="fill"></div></div>
-        <div class="stat-tile">
+        <div id="progressBar" class="bar" role="progressbar" aria-label="Checklist completion" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div id="fill" class="fill"></div></div>
+        <button class="stat-tile" type="button" data-status-filter="collected" title="Show collected sprites">
           <div id="collectedCount" class="stat-value">0</div>
           <div class="stat-label">Collected</div>
-        </div>
-        <div class="stat-tile">
+        </button>
+        <button class="stat-tile" type="button" data-status-filter="mastered" title="Show mastered sprites">
           <div id="masteredCount" class="stat-value">0</div>
           <div class="stat-label">Mastered</div>
-        </div>
-        <div class="stat-tile">
+        </button>
+        <button class="stat-tile" type="button" data-status-filter="not-found" title="Show remaining sprites">
+          <div id="remainingCount" class="stat-value">0</div>
+          <div class="stat-label">Remaining</div>
+        </button>
+        <button class="stat-tile" type="button" data-status-filter="collected" title="Show collected sprites">
           <div id="percentDone" class="stat-value">0%</div>
           <div class="stat-label">Done</div>
-        </div>
+        </button>
       </div>
     </section>
 
@@ -900,10 +920,13 @@
     const statusEl = document.getElementById("status");
     const collectedCountEl = document.getElementById("collectedCount");
     const masteredCountEl = document.getElementById("masteredCount");
+    const remainingCountEl = document.getElementById("remainingCount");
     const percentDoneEl = document.getElementById("percentDone");
+    const progressBarEl = document.getElementById("progressBar");
     const fillEl = document.getElementById("fill");
     const spriteSearch = document.getElementById("spriteSearch");
     const statusFilter = document.getElementById("statusFilter");
+    const statFilterButtons = document.querySelectorAll("[data-status-filter]");
     const clearFiltersButton = document.getElementById("clearFilters");
     const compactModeButton = document.getElementById("compactMode");
     const siteCounter = document.getElementById("siteCounter");
@@ -1003,14 +1026,16 @@
 
     function applyFilters() {
       const query = (spriteSearch?.value || "").trim().toLowerCase();
-      const statusFilter = currentStatusFilter();
+      const selectedStatus = currentStatusFilter();
       let visibleGroups = 0;
       document.querySelectorAll(".sprite-group").forEach(group => {
         let visibleCount = 0;
         group.querySelectorAll(".sprite-card").forEach(card => {
           const haystack = `${card.dataset.name || ""} ${group.dataset.family || ""}`.toLowerCase();
           const matchesSearch = !query || haystack.includes(query);
-          const matchesStatus = statusFilter === "all" || card.dataset.state === statusFilter;
+          const matchesStatus = selectedStatus === "all"
+            || (selectedStatus === "collected" && card.dataset.state !== "not-found")
+            || card.dataset.state === selectedStatus;
           const isVisible = matchesSearch && matchesStatus;
           card.hidden = !isVisible;
           if (isVisible) visibleCount += 1;
@@ -1019,10 +1044,21 @@
         if (visibleCount > 0) visibleGroups += 1;
       });
       if (emptyResults) emptyResults.hidden = visibleGroups > 0;
+      statFilterButtons.forEach(button => {
+        const isActive = button.dataset.statusFilter === selectedStatus;
+        button.classList.toggle("is-active", isActive);
+        button.setAttribute("aria-pressed", String(isActive));
+      });
     }
 
     if (spriteSearch) spriteSearch.addEventListener("input", applyFilters);
     if (statusFilter) statusFilter.addEventListener("change", applyFilters);
+    statFilterButtons.forEach(button => {
+      button.addEventListener("click", () => {
+        if (statusFilter) statusFilter.value = button.dataset.statusFilter;
+        applyFilters();
+      });
+    });
     if (clearFiltersButton) {
       clearFiltersButton.addEventListener("click", () => {
         if (spriteSearch) spriteSearch.value = "";
@@ -1099,11 +1135,15 @@
       const done = checks.filter(c => c.dataset.state !== "not-found").length;
       const mastered = checks.filter(c => c.dataset.state === "mastered").length;
       const total = checks.length;
+      const remaining = total - done;
       const percent = total > 0 ? Math.round((done / total) * 100) : 0;
       collectedCountEl.textContent = done;
       masteredCountEl.textContent = mastered;
+      remainingCountEl.textContent = remaining;
       percentDoneEl.textContent = `${percent}%`;
       fillEl.style.width = `${percent}%`;
+      progressBarEl.setAttribute("aria-valuenow", String(percent));
+      progressBarEl.setAttribute("aria-valuetext", `${done} of ${total} sprites collected`);
     }
 
     function setStatus(message, isError = false) {
@@ -1128,11 +1168,17 @@
     }
 
     function saveLocal() {
-      localStorage.setItem(LS_KEY, JSON.stringify(currentData(), null, 2));
+      try {
+        localStorage.setItem(LS_KEY, JSON.stringify(currentData(), null, 2));
+        return true;
+      } catch (err) {
+        setStatus(`Autosave failed: ${escapeHtml(err.message)}. Use <b>Export list</b> to save a backup.`, true);
+        return false;
+      }
     }
 
     function scheduleSave() {
-      saveLocal();
+      if (!saveLocal()) return;
       clearTimeout(saveTimer);
       saveTimer = setTimeout(() => {
         setStatus(`Autosaved in this browser. Use <b>Export list</b> to download a shareable JSON backup.`);
@@ -1144,8 +1190,10 @@
       const a = document.createElement("a");
       a.href = URL.createObjectURL(blob);
       a.download = SAVE_NAME;
+      document.body.appendChild(a);
       a.click();
-      URL.revokeObjectURL(a.href);
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(a.href), 0);
       setStatus(`Exported <b>${SAVE_NAME}</b>. Share or keep this file as a backup, then use <b>Import list</b> to reload it.`);
     });
 
@@ -1159,8 +1207,9 @@
       try {
         const data = JSON.parse(await file.text());
         applyData(data);
-        saveLocal();
-        setStatus(`Imported <b>${escapeHtml(file.name)}</b> and saved current state in this browser.`);
+        if (saveLocal()) {
+          setStatus(`Imported <b>${escapeHtml(file.name)}</b> and saved current state in this browser.`);
+        }
       } catch (err) {
         setStatus(`Import failed: ${escapeHtml(err.message)}`, true);
       } finally {
@@ -1180,13 +1229,15 @@
       const saved = localStorage.getItem(LS_KEY);
       if (saved) {
         applyData(JSON.parse(saved));
-        saveLocal();
-        setStatus(`Loaded browser autosave. Use <b>Export list</b> to download a shareable JSON backup.`);
+        if (saveLocal()) {
+          setStatus(`Loaded browser autosave. Use <b>Export list</b> to download a shareable JSON backup.`);
+        }
       } else {
         updateProgress();
       }
-    } catch {
+    } catch (err) {
       updateProgress();
+      setStatus(`Saved progress could not be loaded: ${escapeHtml(err.message)}. Import a backup or start a new checklist.`, true);
     }
   </script>
 </body>
