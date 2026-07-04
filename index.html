@@ -1125,6 +1125,7 @@
       if (!confirm("Clear every checked sprite?")) return;
       checks.forEach(c => updateSpriteState(c, "not-found"));
       updateProgress();
+      applyFilters();
       scheduleSave();
     });
 
