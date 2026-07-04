@@ -848,6 +848,8 @@
     const SAVE_NAME = "fortnite-sprite-checklist-save.json";
     const LS_KEY = "fortnite-sprite-checklist:v1";
     const COMPACT_LS_KEY = "fortnite-sprite-checklist:compact-mode";
+    const SEARCH_LS_KEY = "fortnite-sprite-checklist:search";
+    const FILTER_LS_KEY = "fortnite-sprite-checklist:status-filter";
     const FALLBACK_TRACKER_TARGET = "sprites.doomedgaming.com";
     const EAGER_IMAGE_COUNT = 2;
     const STATES = ["not-found", "found", "mastered"];
@@ -1032,6 +1034,19 @@
         applyFilters();
         scheduleSave();
       });
+      card.addEventListener("keydown", event => {
+        const requestedState = {
+          "1": "not-found",
+          "2": "found",
+          "3": "mastered"
+        }[event.key];
+        if (!requestedState || card.dataset.state === requestedState) return;
+        event.preventDefault();
+        updateSpriteState(card, requestedState);
+        updateProgress();
+        applyFilters();
+        scheduleSave();
+      });
       return card;
     }
 
@@ -1068,6 +1083,27 @@
       return (spriteSearch?.value || "").trim().toLowerCase().split(/\s+/).filter(Boolean);
     }
 
+    function saveFilterView() {
+      try {
+        localStorage.setItem(SEARCH_LS_KEY, spriteSearch?.value || "");
+        localStorage.setItem(FILTER_LS_KEY, currentStatusFilter());
+      } catch {
+        // Progress saving reports its own errors; filter view persistence is optional.
+      }
+    }
+
+    function restoreFilterView() {
+      try {
+        if (spriteSearch) spriteSearch.value = localStorage.getItem(SEARCH_LS_KEY) || "";
+        const savedFilter = localStorage.getItem(FILTER_LS_KEY);
+        if (statusFilter && savedFilter && Array.from(statusFilter.options).some(option => option.value === savedFilter)) {
+          statusFilter.value = savedFilter;
+        }
+      } catch {
+        // Ignore optional saved filter view if browser storage is unavailable.
+      }
+    }
+
     function applyFilters() {
       const terms = searchTerms();
       const selectedStatus = currentStatusFilter();
@@ -1090,6 +1126,7 @@
         if (visibleCount > 0) visibleGroups += 1;
         visibleSprites += visibleCount;
       });
+      saveFilterView();
       if (emptyResults) emptyResults.hidden = visibleGroups > 0;
       if (filterSummaryEl) {
         const queryText = terms.length > 0 ? ` matching "${escapeHtml(spriteSearch.value.trim())}"` : "";
@@ -1103,6 +1140,14 @@
     }
 
     if (spriteSearch) spriteSearch.addEventListener("input", applyFilters);
+    if (spriteSearch) {
+      spriteSearch.addEventListener("keydown", event => {
+        if (event.key !== "Escape" || !spriteSearch.value) return;
+        event.preventDefault();
+        spriteSearch.value = "";
+        applyFilters();
+      });
+    }
     if (statusFilter) statusFilter.addEventListener("change", applyFilters);
     statFilterButtons.forEach(button => {
       button.addEventListener("click", () => {
@@ -1241,6 +1286,13 @@
       return SAVE_NAME.replace(".json", `-${new Date().toISOString().slice(0, 10)}.json`);
     }
 
+    function progressCounts() {
+      return {
+        collected: checks.filter(c => c.dataset.state !== "not-found").length,
+        mastered: checks.filter(c => c.dataset.state === "mastered").length
+      };
+    }
+
     function scheduleSave() {
       if (!saveLocal()) return;
       clearTimeout(saveTimer);
@@ -1273,7 +1325,8 @@
         const data = JSON.parse(await file.text());
         applyData(data);
         if (saveLocal()) {
-          setStatus(`Imported <b>${escapeHtml(file.name)}</b> and saved current state in this browser.`);
+          const counts = progressCounts();
+          setStatus(`Imported <b>${escapeHtml(file.name)}</b>: ${counts.collected} collected, ${counts.mastered} mastered. Saved current state in this browser.`);
         }
       } catch (err) {
         setStatus(`Import failed: ${escapeHtml(err.message)}`, true);
@@ -1283,12 +1336,15 @@
     });
 
     onOptional("resetAll", "click", async () => {
-      if (!confirm("Clear every checked sprite?")) return;
+      const counts = progressCounts();
+      if (!confirm(`Clear ${counts.collected} collected sprite${counts.collected === 1 ? "" : "s"}?`)) return;
       checks.forEach(c => updateSpriteState(c, "not-found"));
       updateProgress();
       applyFilters();
       scheduleSave();
     });
+
+    restoreFilterView();
 
     try {
       const saved = localStorage.getItem(LS_KEY);
@@ -1299,9 +1355,11 @@
         }
       } else {
         updateProgress();
+        applyFilters();
       }
     } catch (err) {
       updateProgress();
+      applyFilters();
       setStatus(`Saved progress could not be loaded: ${escapeHtml(err.message)}. Import a backup or start a new checklist.`, true);
     }
   </script>
