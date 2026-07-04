@@ -323,6 +323,26 @@
     .sprite-card[hidden] {
       display: none;
     }
+    .empty-results {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin: 0;
+      padding: 18px;
+      color: var(--muted);
+      text-align: center;
+      background: rgba(0,0,0,.16);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+    }
+    .empty-results[hidden] {
+      display: none;
+    }
+    .empty-results button {
+      flex: 0 0 auto;
+    }
     .sprite-group-title {
       margin: 0;
       color: #dffcff;
@@ -758,6 +778,10 @@
     </section>
 
     <section id="spriteGroups" class="sprite-groups" aria-label="Sprite checklist"></section>
+    <p id="emptyResults" class="empty-results" role="status" aria-live="polite" hidden>
+      <span>No sprites match the current filters.</span>
+      <button id="clearFilters" class="secondary" type="button">Clear filters</button>
+    </p>
 
     <section class="disclaimers" aria-label="Disclaimer and copyright">
       <p><strong>Save notice:</strong> Progress is saved in this browser's local storage. Existing progress from the previous checklist is mapped into this sprite grid where the sprite still exists.</p>
@@ -872,6 +896,7 @@
     ];
 
     const spriteGroups = document.getElementById("spriteGroups");
+    const emptyResults = document.getElementById("emptyResults");
     const statusEl = document.getElementById("status");
     const collectedCountEl = document.getElementById("collectedCount");
     const masteredCountEl = document.getElementById("masteredCount");
@@ -879,6 +904,7 @@
     const fillEl = document.getElementById("fill");
     const spriteSearch = document.getElementById("spriteSearch");
     const statusFilter = document.getElementById("statusFilter");
+    const clearFiltersButton = document.getElementById("clearFilters");
     const compactModeButton = document.getElementById("compactMode");
     const siteCounter = document.getElementById("siteCounter");
     const siteCounterImage = document.getElementById("siteCounterImage");
@@ -978,6 +1004,7 @@
     function applyFilters() {
       const query = (spriteSearch?.value || "").trim().toLowerCase();
       const statusFilter = currentStatusFilter();
+      let visibleGroups = 0;
       document.querySelectorAll(".sprite-group").forEach(group => {
         let visibleCount = 0;
         group.querySelectorAll(".sprite-card").forEach(card => {
@@ -989,11 +1016,21 @@
           if (isVisible) visibleCount += 1;
         });
         group.hidden = visibleCount === 0;
+        if (visibleCount > 0) visibleGroups += 1;
       });
+      if (emptyResults) emptyResults.hidden = visibleGroups > 0;
     }
 
     if (spriteSearch) spriteSearch.addEventListener("input", applyFilters);
     if (statusFilter) statusFilter.addEventListener("change", applyFilters);
+    if (clearFiltersButton) {
+      clearFiltersButton.addEventListener("click", () => {
+        if (spriteSearch) spriteSearch.value = "";
+        if (statusFilter) statusFilter.value = "all";
+        applyFilters();
+        spriteSearch?.focus();
+      });
+    }
 
     function setCompactMode(enabled, shouldSave = true) {
       document.body.classList.toggle("compact-mode", enabled);
@@ -1075,6 +1112,16 @@
       statusEl.style.color = isError ? "#ffb3c0" : "#cfeeff";
     }
 
+    function escapeHtml(value) {
+      return String(value).replace(/[&<>"']/g, char => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+      })[char]);
+    }
+
     function onOptional(id, eventName, handler) {
       const el = document.getElementById(id);
       if (el) el.addEventListener(eventName, handler);
@@ -1113,9 +1160,9 @@
         const data = JSON.parse(await file.text());
         applyData(data);
         saveLocal();
-        setStatus(`Imported <b>${file.name}</b> and saved current state in this browser.`);
+        setStatus(`Imported <b>${escapeHtml(file.name)}</b> and saved current state in this browser.`);
       } catch (err) {
-        setStatus(`Import failed: ${err.message}`, true);
+        setStatus(`Import failed: ${escapeHtml(err.message)}`, true);
       } finally {
         event.target.value = "";
       }
