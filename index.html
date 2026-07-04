@@ -123,6 +123,12 @@
       flex: 0 0 auto;
     }
     button:hover { transform: translateY(-1px); filter: brightness(1.08); }
+    button:disabled {
+      cursor: not-allowed;
+      opacity: .48;
+      transform: none;
+      filter: none;
+    }
     button:focus-visible,
     .site-counter:focus-visible {
       outline: 4px solid var(--yellow);
@@ -226,6 +232,13 @@
       grid-template-columns: minmax(0, 1fr) repeat(4, 108px);
       gap: 12px;
       align-items: center;
+    }
+    .filter-summary {
+      margin: -4px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 800;
+      line-height: 1.35;
     }
     .bar {
       min-width: 0;
@@ -795,6 +808,7 @@
           <div class="stat-label">Done</div>
         </button>
       </div>
+      <p id="filterSummary" class="filter-summary" aria-live="polite"></p>
     </section>
 
     <section id="spriteGroups" class="sprite-groups" aria-label="Sprite checklist"></section>
@@ -918,6 +932,7 @@
     const spriteGroups = document.getElementById("spriteGroups");
     const emptyResults = document.getElementById("emptyResults");
     const statusEl = document.getElementById("status");
+    const filterSummaryEl = document.getElementById("filterSummary");
     const collectedCountEl = document.getElementById("collectedCount");
     const masteredCountEl = document.getElementById("masteredCount");
     const remainingCountEl = document.getElementById("remainingCount");
@@ -929,6 +944,7 @@
     const statFilterButtons = document.querySelectorAll("[data-status-filter]");
     const clearFiltersButton = document.getElementById("clearFilters");
     const compactModeButton = document.getElementById("compactMode");
+    const resetAllButton = document.getElementById("resetAll");
     const siteCounter = document.getElementById("siteCounter");
     const siteCounterImage = document.getElementById("siteCounterImage");
     const checks = [];
@@ -1024,14 +1040,20 @@
       return statusFilter?.value || "all";
     }
 
+    function currentStatusLabel() {
+      return statusFilter?.selectedOptions?.[0]?.textContent || "All statuses";
+    }
+
     function applyFilters() {
       const query = (spriteSearch?.value || "").trim().toLowerCase();
       const selectedStatus = currentStatusFilter();
       let visibleGroups = 0;
+      let visibleSprites = 0;
       document.querySelectorAll(".sprite-group").forEach(group => {
         let visibleCount = 0;
         group.querySelectorAll(".sprite-card").forEach(card => {
-          const haystack = `${card.dataset.name || ""} ${group.dataset.family || ""}`.toLowerCase();
+          const stateLabel = STATE_LABELS[card.dataset.state] || "";
+          const haystack = `${card.dataset.name || ""} ${group.dataset.family || ""} ${stateLabel}`.toLowerCase();
           const matchesSearch = !query || haystack.includes(query);
           const matchesStatus = selectedStatus === "all"
             || (selectedStatus === "collected" && card.dataset.state !== "not-found")
@@ -1042,8 +1064,13 @@
         });
         group.hidden = visibleCount === 0;
         if (visibleCount > 0) visibleGroups += 1;
+        visibleSprites += visibleCount;
       });
       if (emptyResults) emptyResults.hidden = visibleGroups > 0;
+      if (filterSummaryEl) {
+        const queryText = query ? ` matching "${escapeHtml(spriteSearch.value.trim())}"` : "";
+        filterSummaryEl.innerHTML = `Showing <b>${visibleSprites}</b> of <b>${checks.length}</b> sprites${queryText} in <b>${escapeHtml(currentStatusLabel())}</b>.`;
+      }
       statFilterButtons.forEach(button => {
         const isActive = button.dataset.statusFilter === selectedStatus;
         button.classList.toggle("is-active", isActive);
@@ -1055,7 +1082,9 @@
     if (statusFilter) statusFilter.addEventListener("change", applyFilters);
     statFilterButtons.forEach(button => {
       button.addEventListener("click", () => {
-        if (statusFilter) statusFilter.value = button.dataset.statusFilter;
+        if (statusFilter) {
+          statusFilter.value = statusFilter.value === button.dataset.statusFilter ? "all" : button.dataset.statusFilter;
+        }
         applyFilters();
       });
     });
@@ -1144,6 +1173,7 @@
       fillEl.style.width = `${percent}%`;
       progressBarEl.setAttribute("aria-valuenow", String(percent));
       progressBarEl.setAttribute("aria-valuetext", `${done} of ${total} sprites collected`);
+      if (resetAllButton) resetAllButton.disabled = done === 0;
     }
 
     function setStatus(message, isError = false) {
@@ -1177,6 +1207,10 @@
       }
     }
 
+    function exportFileName() {
+      return SAVE_NAME.replace(".json", `-${new Date().toISOString().slice(0, 10)}.json`);
+    }
+
     function scheduleSave() {
       if (!saveLocal()) return;
       clearTimeout(saveTimer);
@@ -1186,15 +1220,16 @@
     }
 
     onOptional("exportFile", "click", () => {
+      const fileName = exportFileName();
       const blob = new Blob([JSON.stringify(currentData(), null, 2)], { type: "application/json" });
       const a = document.createElement("a");
       a.href = URL.createObjectURL(blob);
-      a.download = SAVE_NAME;
+      a.download = fileName;
       document.body.appendChild(a);
       a.click();
       a.remove();
       setTimeout(() => URL.revokeObjectURL(a.href), 0);
-      setStatus(`Exported <b>${SAVE_NAME}</b>. Share or keep this file as a backup, then use <b>Import list</b> to reload it.`);
+      setStatus(`Exported <b>${fileName}</b>. Share or keep this file as a backup, then use <b>Import list</b> to reload it.`);
     });
 
     onOptional("importFileButton", "click", () => {
