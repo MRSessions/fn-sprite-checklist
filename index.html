@@ -289,7 +289,19 @@
       line-height: 1;
     }
     .key {
-      display: none;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px 18px;
+      padding: 12px 16px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 800;
+      line-height: 1.4;
     }
     .key-legend {
       display: flex;
@@ -312,17 +324,16 @@
       width: 22px;
       height: 22px;
       border: 3px solid rgba(255,255,255,.32);
+      border-radius: 50%;
       background: transparent;
     }
     .key-mark.is-found {
-      background: rgba(80,255,125,.86);
-      border-color: #041007;
-      color: #061018;
+      border-color: var(--cyan);
+      color: var(--cyan);
     }
     .key-mark.is-mastered {
-      background: rgba(255,228,93,.94);
-      border-color: #120d02;
-      color: #221700;
+      border-color: var(--green);
+      color: var(--green);
     }
     .key-mark.is-found::after {
       content: "✓";
@@ -335,6 +346,21 @@
       font-size: 18px;
       font-weight: 1000;
       line-height: 1;
+    }
+    .key-instructions {
+      margin: 0;
+      color: var(--muted);
+    }
+    .key-instructions kbd {
+      display: inline-block;
+      min-width: 1.7em;
+      padding: 1px 5px;
+      border: 1px solid rgba(255,255,255,.24);
+      border-radius: 5px;
+      color: var(--text);
+      background: #101b2b;
+      font: inherit;
+      text-align: center;
     }
     .sprite-groups {
       display: grid;
@@ -572,6 +598,7 @@
     }
     body.compact-mode .subtitle,
     body.compact-mode .status,
+    body.compact-mode .key,
     body.compact-mode .disclaimers,
     body.compact-mode .site-footer {
       display: none;
@@ -732,6 +759,7 @@
       .stat-value { font-size: 20px; }
       .stat-label { font-size: 13px; }
       .sprite-groups { gap: 14px; }
+      .key { align-items: flex-start; }
       .sprite-group { padding: 10px; gap: 8px; }
       .sprite-group-title { font-size: 16px; }
       .sprite-grid { grid-template-columns: 1fr; gap: 10px; }
@@ -838,7 +866,18 @@
       <p id="filterSummary" class="filter-summary" aria-live="polite"></p>
     </section>
 
-    <section id="spriteGroups" class="sprite-groups" aria-label="Sprite checklist"></section>
+    <section class="key" aria-label="Sprite state key">
+      <div class="key-legend">
+        <div class="key-item"><span class="key-mark" aria-hidden="true"></span><span>Not Found</span></div>
+        <div class="key-item"><span class="key-mark is-found" aria-hidden="true"></span><span>Found</span></div>
+        <div class="key-item"><span class="key-mark is-mastered" aria-hidden="true"></span><span>Mastered</span></div>
+      </div>
+      <p id="spriteInstructions" class="key-instructions">
+        Click to cycle states; Shift-click goes backward. Keyboard: <kbd>1</kbd> Not Found, <kbd>2</kbd> Found, <kbd>3</kbd> Mastered.
+      </p>
+    </section>
+
+    <section id="spriteGroups" class="sprite-groups" aria-label="Sprite checklist" aria-describedby="spriteInstructions"></section>
     <p id="emptyResults" class="empty-results" role="status" aria-live="polite" hidden>
       <span>No sprites match the current filters.</span>
       <button id="clearFilters" class="secondary" type="button">Clear filters</button>
@@ -1036,6 +1075,8 @@
       card.type = "button";
       card.className = "sprite-card";
       card.id = sprite.id;
+      card.setAttribute("role", "checkbox");
+      card.setAttribute("aria-keyshortcuts", "1 2 3");
       card.dataset.name = sprite.name;
       card.dataset.state = "not-found";
       card.innerHTML = `
@@ -1249,7 +1290,7 @@
       if (stateMark) stateMark.textContent = normalized === "mastered" ? "♛" : normalized === "found" ? "✓" : "";
       card.title = `${card.dataset.name}: ${STATE_LABELS[normalized]}`;
       card.setAttribute("aria-label", card.title);
-      card.setAttribute("aria-pressed", normalized === "not-found" ? "false" : "true");
+      card.setAttribute("aria-checked", normalized === "mastered" ? "true" : normalized === "found" ? "mixed" : "false");
     }
 
     function currentData() {
