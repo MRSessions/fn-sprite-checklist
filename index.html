@@ -866,6 +866,7 @@
     const SEARCH_LS_KEY = "fortnite-sprite-checklist:search";
     const FILTER_LS_KEY = "fortnite-sprite-checklist:status-filter";
     const FALLBACK_TRACKER_TARGET = "sprites.doomedgaming.com";
+    const SAVE_VERSION = 3;
     const EAGER_IMAGE_COUNT = 2;
     const STATES = ["not-found", "found", "mastered"];
     const STATE_LABELS = {
@@ -1240,7 +1241,7 @@
 
     function currentData() {
       return {
-        version: 3,
+        version: SAVE_VERSION,
         savedAt: new Date().toISOString(),
         total: checks.length,
         states: Object.fromEntries(checks.map(c => [c.id, c.dataset.state])),
@@ -1266,8 +1267,50 @@
       applyFilters();
     }
 
-    function isImportData(data) {
-      return data && typeof data === "object" && !Array.isArray(data);
+    function isRecord(value) {
+      return value !== null && typeof value === "object" && !Array.isArray(value);
+    }
+
+    function validateImportMap(map, label, validValue) {
+      if (!isRecord(map)) throw new Error(`${label} must be an object.`);
+      let recognizedIds = 0;
+      for (const [id, value] of Object.entries(map)) {
+        const card = checks.find(check => check.id === id || (legacyIds[check.id] || []).includes(id));
+        if (!card) continue;
+        recognizedIds += 1;
+        if (!validValue(value)) throw new Error(`${label} contains an invalid state for ${id}.`);
+      }
+      return recognizedIds;
+    }
+
+    function validateImportData(data) {
+      if (!isRecord(data)) throw new Error("Backup file must contain a checklist object.");
+      if (data.version !== undefined) {
+        if (!Number.isInteger(data.version) || data.version < 1) throw new Error("Backup version is invalid.");
+        if (data.version > SAVE_VERSION) throw new Error(`Backup version ${data.version} is not supported yet.`);
+      }
+
+      const hasStates = Object.prototype.hasOwnProperty.call(data, "states");
+      const hasChecked = Object.prototype.hasOwnProperty.call(data, "checked");
+      let recognizedIds = 0;
+      if (hasStates || hasChecked) {
+        if (hasStates) recognizedIds += validateImportMap(data.states, "Backup states", value => STATES.includes(value));
+        if (hasChecked) recognizedIds += validateImportMap(data.checked, "Backup checked states", value => typeof value === "boolean");
+      } else {
+        recognizedIds += validateImportMap(data, "Legacy backup", value => typeof value === "boolean" || STATES.includes(value));
+      }
+      if (recognizedIds === 0) throw new Error("Backup does not contain any recognized sprites.");
+      return data;
+    }
+
+    function importedProgressCounts(data) {
+      const states = data.states || null;
+      const checked = data.checked || (data.states ? {} : data);
+      const importedStates = checks.map(card => normalizeState(stateForCard(card, states, checked)));
+      return {
+        collected: importedStates.filter(state => state !== "not-found").length,
+        mastered: importedStates.filter(state => state === "mastered").length
+      };
     }
 
     function updateProgress() {
@@ -1363,11 +1406,17 @@
       const file = event.target.files[0];
       if (!file) return;
       try {
-        const data = JSON.parse(await file.text());
-        if (!isImportData(data)) throw new Error("Backup file must contain a checklist object.");
+        const data = validateImportData(JSON.parse(await file.text()));
+        const counts = importedProgressCounts(data);
+        const shouldImport = confirm(
+          `Import ${counts.collected} collected sprite${counts.collected === 1 ? "" : "s"} (${counts.mastered} mastered)? This will replace your current checklist.`
+        );
+        if (!shouldImport) {
+          setStatus("Import canceled. Your current checklist was not changed.");
+          return;
+        }
         applyData(data);
         if (saveLocal()) {
-          const counts = progressCounts();
           setStatus(`Imported <b>${escapeHtml(file.name)}</b>: ${counts.collected} collected, ${counts.mastered} mastered. Saved current state in this browser.`);
         }
       } catch (err) {
