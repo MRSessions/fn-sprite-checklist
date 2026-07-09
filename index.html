@@ -1111,6 +1111,15 @@
       return (spriteSearch?.value || "").trim().toLowerCase().split(/\s+/).filter(Boolean);
     }
 
+    function preserveCardFocus(focusedCard) {
+      if (!focusedCard?.hidden) return;
+      const focusedIndex = checks.indexOf(focusedCard);
+      const nextCard = checks.slice(focusedIndex + 1).find(card => !card.hidden);
+      const previousCard = checks.slice(0, focusedIndex).reverse().find(card => !card.hidden);
+      const focusTarget = nextCard || previousCard || (!emptyResults?.hidden ? clearFiltersButton : null);
+      focusTarget?.focus();
+    }
+
     function saveFilterView() {
       try {
         localStorage.setItem(SEARCH_LS_KEY, spriteSearch?.value || "");
@@ -1133,6 +1142,9 @@
     }
 
     function applyFilters() {
+      const focusedCard = document.activeElement?.classList.contains("sprite-card")
+        ? document.activeElement
+        : null;
       const terms = searchTerms();
       const selectedStatus = currentStatusFilter();
       let visibleGroups = 0;
@@ -1165,6 +1177,7 @@
         button.classList.toggle("is-active", isActive);
         button.setAttribute("aria-pressed", String(isActive));
       });
+      preserveCardFocus(focusedCard);
     }
 
     if (spriteSearch) spriteSearch.addEventListener("input", applyFilters);
