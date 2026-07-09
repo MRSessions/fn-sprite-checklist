@@ -832,7 +832,7 @@
         <div class="search">
           <label for="spriteSearch">Search</label>
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m21 21-4.35-4.35" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"></path><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2.4"></circle></svg>
-          <input id="spriteSearch" type="search" autocomplete="off" placeholder="Search sprites..." />
+          <input id="spriteSearch" type="search" autocomplete="off" placeholder="Search sprite names..." />
         </div>
         <div class="status-select-wrap">
           <select id="statusFilter" class="status-select" aria-label="Filter by sprite status">
@@ -1193,8 +1193,7 @@
       document.querySelectorAll(".sprite-group").forEach(group => {
         let visibleCount = 0;
         group.querySelectorAll(".sprite-card").forEach(card => {
-          const stateLabel = STATE_LABELS[card.dataset.state] || "";
-          const haystack = `${card.dataset.name || ""} ${group.dataset.family || ""} ${stateLabel}`.toLowerCase();
+          const haystack = `${card.dataset.name || ""} ${group.dataset.family || ""}`.toLowerCase();
           const matchesSearch = terms.length === 0 || terms.every(term => haystack.includes(term));
           const matchesStatus = selectedStatus === "all"
             || (selectedStatus === "collected" && card.dataset.state !== "not-found")
