@@ -387,7 +387,7 @@
     }
     .sprite-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(238px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
       gap: 16px;
       align-items: stretch;
     }
@@ -659,7 +659,7 @@
       font-size: 13px;
     }
     body.compact-mode .sprite-grid {
-      grid-template-columns: repeat(auto-fill, 64px);
+      grid-template-columns: repeat(auto-fit, minmax(50px, 1fr));
       gap: 5px;
       justify-content: start;
     }
@@ -686,7 +686,7 @@
     }
     body.compact-mode .sprite-info {
       min-height: 0;
-      gap: 6px;
+      gap: 3px;
       align-items: start;
     }
     body.compact-mode .sprite-name {
@@ -879,6 +879,13 @@
       ["Gummy ", "gummy-"],
       ["Galaxy ", "galaxy-"]
     ];
+    const HOLOFOIL_FAMILIES = new Set([
+      "Water",
+      "Fire",
+      "Ghost",
+      "King",
+      "Striker"
+    ]);
     const SPRITE_FAMILIES = [
       "Water",
       "Earth",
@@ -942,16 +949,21 @@
     };
 
     const sprites = [
-      ...SPRITE_FAMILIES.flatMap(family => VARIANTS.map(([prefix, filePrefix]) => {
+      ...SPRITE_FAMILIES.flatMap(family => {
         const base = slug(family);
-        const id = `${filePrefix}${base}-sprite`;
-        return {
-          id,
-          family,
-          name: `${prefix}${family} Sprite`,
-          src: `sprites/${id}.webp`
-        };
-      })),
+        const familyVariants = HOLOFOIL_FAMILIES.has(family)
+          ? [...VARIANTS, ["Holofoil ", "holofoil-"]]
+          : VARIANTS;
+        return familyVariants.map(([prefix, filePrefix]) => {
+          const id = `${filePrefix}${base}-sprite`;
+          return {
+            id,
+            family,
+            name: `${prefix}${family} Sprite`,
+            src: `sprites/${id}.webp`
+          };
+        });
+      }),
       ...singleSprites.map(name => {
         const id = slug(name);
         return { id, family: name, name, src: `sprites/${id}.webp` };
