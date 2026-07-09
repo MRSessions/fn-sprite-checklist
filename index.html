@@ -1366,6 +1366,18 @@
       }
     }
 
+    window.addEventListener("storage", event => {
+      if (event.key !== LS_KEY || event.newValue === null) return;
+      if (event.storageArea && event.storageArea !== localStorage) return;
+      try {
+        const data = validateImportData(JSON.parse(event.newValue));
+        applyData(data);
+        setStatus("Checklist updated from another browser tab.");
+      } catch (err) {
+        setStatus(`A checklist update from another tab could not be loaded: ${escapeHtml(err.message)}`, true);
+      }
+    });
+
     function exportFileName() {
       return SAVE_NAME.replace(".json", `-${new Date().toISOString().slice(0, 10)}.json`);
     }
