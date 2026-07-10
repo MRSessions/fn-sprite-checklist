@@ -782,6 +782,17 @@
         grid-template-columns: repeat(4, minmax(0, 1fr));
       }
     }
+    @media (max-width: 480px) {
+      .progress-row {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+      .stat-tile {
+        min-height: 64px;
+      }
+      body.compact-mode .progress-row {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+    }
     @media (prefers-reduced-motion: reduce) {
       *,
       *::before,
