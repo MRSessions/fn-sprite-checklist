@@ -940,6 +940,16 @@
       "Air",
       "Seven"
     ]);
+    const CUBE_FAMILIES = new Set([
+      "Batman",
+      "Earth",
+      "Fire",
+      "Dream",
+      "Punk",
+      "Fishy",
+      "Boss",
+      "Grim"
+    ]);
     const SPRITE_FAMILIES = [
       "Batman",
       "Water",
@@ -1008,9 +1018,11 @@
     const sprites = [
       ...SPRITE_FAMILIES.flatMap(family => {
         const base = slug(family);
-        const familyVariants = HOLOFOIL_FAMILIES.has(family)
-          ? [...VARIANTS, ["Holofoil ", "holofoil-"]]
-          : VARIANTS;
+        const familyVariants = [
+          ...VARIANTS,
+          ...(HOLOFOIL_FAMILIES.has(family) ? [["Holofoil ", "holofoil-"]] : []),
+          ...(CUBE_FAMILIES.has(family) ? [["Cube ", "cube-"]] : [])
+        ];
         return familyVariants.map(([prefix, filePrefix]) => {
           const id = `${filePrefix}${base}-sprite`;
           return {

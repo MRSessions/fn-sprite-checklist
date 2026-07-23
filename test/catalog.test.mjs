@@ -5,18 +5,22 @@ import test from "node:test";
 
 import { createApp } from "./app-harness.mjs";
 
-test("matches the 83 released sprites in the Fortnite.GG catalog", () => {
+test("matches the 91 released sprites in the Fortnite.GG catalog", () => {
   const app = createApp();
   const catalog = app.evaluate("sprites.map(({ id, name, src }) => ({ id, name, src }))");
 
-  assert.equal(catalog.length, 83);
+  assert.equal(catalog.length, 91);
   assert.deepEqual(
     Array.from(catalog).filter(sprite => [
       "batman-sprite", "holofoil-batman-sprite", "pollo", "vini-jr",
-      "air-sprite", "holofoil-air-sprite", "seven-sprite", "holofoil-seven-sprite"
+      "air-sprite", "holofoil-air-sprite", "seven-sprite", "holofoil-seven-sprite",
+      "cube-batman-sprite", "cube-earth-sprite", "cube-fire-sprite", "cube-dream-sprite",
+      "cube-punk-sprite", "cube-fishy-sprite", "cube-boss-sprite", "cube-grim-sprite"
     ].includes(sprite.id)).map(sprite => sprite.name),
     [
-      "Batman Sprite", "Holofoil Batman Sprite", "Air Sprite", "Holofoil Air Sprite",
+      "Batman Sprite", "Holofoil Batman Sprite", "Cube Batman Sprite", "Cube Earth Sprite",
+      "Cube Fire Sprite", "Cube Dream Sprite", "Cube Punk Sprite", "Cube Fishy Sprite",
+      "Cube Boss Sprite", "Cube Grim Sprite", "Air Sprite", "Holofoil Air Sprite",
       "Seven Sprite", "Holofoil Seven Sprite", "Pollo", "Vini Jr."
     ]
   );
