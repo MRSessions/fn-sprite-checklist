@@ -22,7 +22,7 @@ test("searches sprite names and families regardless of state", () => {
   app.evaluate("applyFilters()");
 
   const visibleCards = app.document.querySelectorAll(".sprite-card").filter(card => !card.hidden);
-  assert.equal(visibleCards.length, 5);
+  assert.equal(visibleCards.length, 6);
   assert.equal(visibleCards.every(card => card.dataset.name.includes("Water")), true);
 });
 

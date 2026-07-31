@@ -936,9 +936,12 @@
       "Fire",
       "Ghost",
       "King",
+      "Zero Point",
+      "Grim",
       "Striker",
       "Air",
-      "Seven"
+      "Seven",
+      "Peely"
     ]);
     const CUBE_FAMILIES = new Set([
       "Batman",
@@ -948,7 +951,17 @@
       "Punk",
       "Fishy",
       "Boss",
-      "Grim"
+      "Grim",
+      "Zero Point"
+    ]);
+    const QUACK_FAMILIES = new Set([
+      "Water",
+      "Earth",
+      "Fire",
+      "Zero Point"
+    ]);
+    const GEM_FAMILIES = new Set([
+      "Llama"
     ]);
     const SPRITE_FAMILIES = [
       "Batman",
@@ -968,8 +981,11 @@
       "Boss",
       "Grim",
       "Air",
-      "Seven"
+      "Seven",
+      "Llama",
+      "Peely"
     ];
+    const baseOnlyFamilies = ["John Wick"];
     const singleSprites = ["Pollo", "Vini Jr.", "Burnt Peanut"];
     const legacyIds = {
       "water-sprite": ["water-sprites-cyan"],
@@ -1016,12 +1032,18 @@
     };
 
     const sprites = [
+      ...baseOnlyFamilies.map(family => {
+        const id = `${slug(family)}-sprite`;
+        return { id, family, name: `${family} Sprite`, src: `sprites/${id}.webp` };
+      }),
       ...SPRITE_FAMILIES.flatMap(family => {
         const base = slug(family);
         const familyVariants = [
           ...VARIANTS,
           ...(HOLOFOIL_FAMILIES.has(family) ? [["Holofoil ", "holofoil-"]] : []),
-          ...(CUBE_FAMILIES.has(family) ? [["Cube ", "cube-"]] : [])
+          ...(CUBE_FAMILIES.has(family) ? [["Cube ", "cube-"]] : []),
+          ...(QUACK_FAMILIES.has(family) ? [["Quack ", "quack-"]] : []),
+          ...(GEM_FAMILIES.has(family) ? [["Gem ", "gem-"]] : [])
         ];
         return familyVariants.map(([prefix, filePrefix]) => {
           const id = `${filePrefix}${base}-sprite`;
@@ -1148,7 +1170,7 @@
       return card;
     }
 
-    for (const family of [...SPRITE_FAMILIES, ...singleSprites]) {
+    for (const family of [...baseOnlyFamilies, ...SPRITE_FAMILIES, ...singleSprites]) {
       const groupSprites = sprites.filter(sprite => sprite.family === family);
       const group = document.createElement("section");
       group.className = "sprite-group";
