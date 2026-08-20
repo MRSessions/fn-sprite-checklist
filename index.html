@@ -4,15 +4,15 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Fortnite Sprite Checklist</title>
-  <meta name="description" content="Track collected Fortnite sprites with a browser-saved checklist for Not Found, Found, and Mastered progress." />
+  <meta name="description" content="Track collected Fortnite sprites by season with a browser-saved checklist for Not Found, Found, and Mastered progress." />
   <meta property="og:title" content="Fortnite Sprite Checklist" />
-  <meta property="og:description" content="Track collected Fortnite sprites with a browser-saved checklist for Not Found, Found, and Mastered progress." />
+  <meta property="og:description" content="Track collected Fortnite sprites by season with a browser-saved checklist for Not Found, Found, and Mastered progress." />
   <meta property="og:type" content="website" />
   <meta name="twitter:card" content="summary" />
   <meta name="theme-color" content="#07101a" />
   <link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="12" fill="%2307101a"/><circle cx="32" cy="32" r="21" fill="%2300d7df"/><path d="M22 34l7 7 15-18" fill="none" stroke="%23061018" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg>' />
-  <link rel="preload" as="image" href="sprites/water-sprite.webp" fetchpriority="high" />
-  <link rel="preload" as="image" href="sprites/gold-water-sprite.webp" fetchpriority="high" />
+  <link rel="preload" as="image" href="sprites/jackrabbit-sprite.webp" fetchpriority="high" />
+  <link rel="preload" as="image" href="sprites/gold-jackrabbit-sprite.webp" fetchpriority="high" />
   <style>
     * { box-sizing: border-box; }
     :root {
@@ -153,7 +153,7 @@
     }
     .overview-controls {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) minmax(172px, auto);
+      grid-template-columns: minmax(0, 1fr) minmax(252px, auto) minmax(172px, auto);
       gap: 12px;
       align-items: center;
     }
@@ -173,6 +173,7 @@
     }
     .search label { position: absolute; inline-size: 1px; block-size: 1px; overflow: hidden; clip-path: inset(50%); }
     .search input,
+    .season-select,
     .status-select {
       width: 100%;
       min-width: 0;
@@ -189,13 +190,20 @@
       padding: 0 16px 0 48px;
     }
     .search input:focus,
+    .season-select:focus,
     .status-select:focus {
       border-color: rgba(102,234,243,.78);
       box-shadow: 0 0 0 3px rgba(102,234,243,.14);
     }
     .search input::placeholder { color: var(--faint); }
+    .season-select-wrap,
     .status-select-wrap {
       position: relative;
+    }
+    .season-select-wrap {
+      min-width: 252px;
+    }
+    .status-select-wrap {
       min-width: 176px;
     }
     .status-select-wrap::before {
@@ -211,11 +219,18 @@
       clip-path: polygon(8% 10%, 92% 10%, 60% 48%, 60% 90%, 40% 78%, 40% 48%);
       pointer-events: none;
     }
+    .season-select,
     .status-select {
       appearance: none;
-      padding: 0 38px 0 44px;
       cursor: pointer;
     }
+    .season-select {
+      padding: 0 38px 0 14px;
+    }
+    .status-select {
+      padding: 0 38px 0 44px;
+    }
+    .season-select-wrap::after,
     .status-select-wrap::after {
       content: "";
       position: absolute;
@@ -621,10 +636,11 @@
       padding: 8px;
     }
     body.compact-mode .overview-controls {
-      grid-template-columns: minmax(0, 1fr) 148px;
+      grid-template-columns: minmax(0, 1fr) 218px 148px;
       gap: 8px;
     }
     body.compact-mode .search input,
+    body.compact-mode .season-select,
     body.compact-mode .status-select {
       height: 34px;
       border-radius: 9px;
@@ -638,6 +654,7 @@
     body.compact-mode .search input {
       padding-left: 34px;
     }
+    body.compact-mode .season-select-wrap,
     body.compact-mode .status-select-wrap {
       min-width: 0;
     }
@@ -646,10 +663,17 @@
       width: 14px;
       height: 14px;
     }
+    body.compact-mode .season-select,
     body.compact-mode .status-select {
-      padding-left: 32px;
       padding-right: 28px;
     }
+    body.compact-mode .season-select {
+      padding-left: 10px;
+    }
+    body.compact-mode .status-select {
+      padding-left: 32px;
+    }
+    body.compact-mode .season-select-wrap::after,
     body.compact-mode .status-select-wrap::after {
       right: 12px;
     }
@@ -750,6 +774,7 @@
       }
       .overview-controls,
       .progress-row { grid-template-columns: 1fr; }
+      .season-select-wrap,
       .status-select-wrap { min-width: 0; }
       .progress-row {
         grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -814,7 +839,7 @@
     <section class="toolbar" aria-label="Checklist controls">
       <div class="title">
         <h1>Fortnite Sprite Checklist</h1>
-        <div class="subtitle">Track collected Fortnite sprites with browser-saved Not Found, Found, and Mastered progress.</div>
+        <div class="subtitle">Track collected Fortnite sprites by season with browser-saved Not Found, Found, and Mastered progress.</div>
       </div>
       <div class="actions">
         <button id="exportFile" class="action-button" type="button" title="Export list">
@@ -844,6 +869,13 @@
           <label for="spriteSearch">Search</label>
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m21 21-4.35-4.35" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"></path><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2.4"></circle></svg>
           <input id="spriteSearch" type="search" autocomplete="off" placeholder="Search sprite names..." />
+        </div>
+        <div class="season-select-wrap">
+          <select id="seasonFilter" class="season-select" aria-label="Filter by season">
+            <option value="c7s4">Chapter 7 Season 4 (Current)</option>
+            <option value="c7s3">Chapter 7 Season 3</option>
+            <option value="all">All seasons</option>
+          </select>
         </div>
         <div class="status-select-wrap">
           <select id="statusFilter" class="status-select" aria-label="Filter by sprite status">
@@ -895,7 +927,7 @@
     </p>
 
     <section class="disclaimers" aria-label="Disclaimer and copyright">
-      <p><strong>Save notice:</strong> Progress is saved in this browser's local storage. Existing progress from the previous checklist is mapped into this sprite grid where the sprite still exists.</p>
+      <p><strong>Save notice:</strong> Progress for every season is saved together in this browser's local storage. Changing the season filter does not change or remove tracked progress.</p>
       <p><strong>Artwork disclaimer:</strong> Fortnite and related artwork are property of Epic Games, Inc. This fan-made checklist is not affiliated with, endorsed by, sponsored by, or approved by Epic Games, Inc.</p>
       <p><strong>Sprite image source:</strong> Local sprite images were sourced from <a href="https://fortnite.gg/sprites" target="_blank" rel="noopener noreferrer">Fortnite.GG sprites</a>.</p>
       <p><strong>© Doomed Gaming</strong></p>
@@ -918,6 +950,8 @@
     const FALLBACK_TRACKER_TARGET = "sprites.doomedgaming.com";
     const SAVE_VERSION = 3;
     const EAGER_IMAGE_COUNT = 2;
+    const CURRENT_SEASON_ID = "c7s4";
+    const PREVIOUS_SEASON_ID = "c7s3";
     const STATES = ["not-found", "found", "mastered"];
     const STATE_LABELS = {
       "not-found": "Not Found",
@@ -929,6 +963,25 @@
       ["Gold ", "gold-"],
       ["Gummy ", "gummy-"],
       ["Galaxy ", "galaxy-"]
+    ];
+    const SEASON_FOUR_VARIANTS = [
+      ["", ""],
+      ["Gold ", "gold-"],
+      ["Cheat Master ", "cheat-master-"]
+    ];
+    const SEASON_FOUR_FAMILIES = [
+      "Jackrabbit",
+      "Shadow",
+      "Bush",
+      "Tails",
+      "Killswitch",
+      "Adventure",
+      "Klombo",
+      "Jonesy",
+      "Sonic",
+      "Crown",
+      "8-Bit",
+      "Storm Scout"
     ];
     const HOLOFOIL_FAMILIES = new Set([
       "Batman",
@@ -1039,9 +1092,22 @@
     };
 
     const sprites = [
+      ...SEASON_FOUR_FAMILIES.flatMap(family => {
+        const base = slug(family);
+        return SEASON_FOUR_VARIANTS.map(([prefix, filePrefix]) => {
+          const id = `${filePrefix}${base}-sprite`;
+          return {
+            id,
+            family,
+            name: `${prefix}${family} Sprite`,
+            src: `sprites/${id}.webp`,
+            seasons: [CURRENT_SEASON_ID]
+          };
+        });
+      }),
       ...baseOnlyFamilies.map(family => {
         const id = `${slug(family)}-sprite`;
-        return { id, family, name: `${family} Sprite`, src: `sprites/${id}.webp` };
+        return { id, family, name: `${family} Sprite`, src: `sprites/${id}.webp`, seasons: [PREVIOUS_SEASON_ID] };
       }),
       ...SPRITE_FAMILIES.flatMap(family => {
         const base = slug(family);
@@ -1058,15 +1124,17 @@
             id,
             family,
             name: `${prefix}${family} Sprite`,
-            src: `sprites/${id}.webp`
+            src: `sprites/${id}.webp`,
+            seasons: [PREVIOUS_SEASON_ID]
           };
         });
       }),
       ...singleSprites.map(name => {
         const id = slug(name);
-        return { id, family: name, name, src: `sprites/${id}.webp` };
+        return { id, family: name, name, src: `sprites/${id}.webp`, seasons: [PREVIOUS_SEASON_ID] };
       })
     ];
+    const spriteFamilies = [...new Set(sprites.map(sprite => sprite.family))];
 
     const spriteGroups = document.getElementById("spriteGroups");
     const emptyResults = document.getElementById("emptyResults");
@@ -1079,6 +1147,7 @@
     const progressBarEl = document.getElementById("progressBar");
     const fillEl = document.getElementById("fill");
     const spriteSearch = document.getElementById("spriteSearch");
+    const seasonFilter = document.getElementById("seasonFilter");
     const statusFilter = document.getElementById("statusFilter");
     const statFilterButtons = document.querySelectorAll("[data-status-filter]");
     const clearFiltersButton = document.getElementById("clearFilters");
@@ -1136,6 +1205,7 @@
       card.setAttribute("role", "checkbox");
       card.setAttribute("aria-keyshortcuts", "1 2 3");
       card.dataset.name = sprite.name;
+      card.dataset.seasons = sprite.seasons.join(" ");
       card.dataset.state = "not-found";
       card.innerHTML = `
         <span class="sprite-art"><img src="${sprite.src}" ${isEagerImage ? `loading="eager" fetchpriority="high"` : `loading="lazy" fetchpriority="low"`} alt="" decoding="async" width="150" height="150"></span>
@@ -1177,7 +1247,7 @@
       return card;
     }
 
-    for (const family of [...baseOnlyFamilies, ...SPRITE_FAMILIES, ...singleSprites]) {
+    for (const family of spriteFamilies) {
       const groupSprites = sprites.filter(sprite => sprite.family === family);
       const group = document.createElement("section");
       group.className = "sprite-group";
@@ -1204,6 +1274,23 @@
 
     function currentStatusLabel() {
       return statusFilter?.selectedOptions?.[0]?.textContent || "All statuses";
+    }
+
+    function currentSeasonFilter() {
+      return seasonFilter?.value || CURRENT_SEASON_ID;
+    }
+
+    function currentSeasonLabel() {
+      return seasonFilter?.selectedOptions?.[0]?.textContent || "Chapter 7 Season 4 (Current)";
+    }
+
+    function cardMatchesSelectedSeason(card) {
+      const selectedSeason = currentSeasonFilter();
+      return selectedSeason === "all" || (card.dataset.seasons || "").split(/\s+/).includes(selectedSeason);
+    }
+
+    function selectedSeasonCards() {
+      return checks.filter(cardMatchesSelectedSeason);
     }
 
     function searchTerms() {
@@ -1246,6 +1333,7 @@
         : null;
       const terms = searchTerms();
       const selectedStatus = currentStatusFilter();
+      const seasonCards = selectedSeasonCards();
       let visibleGroups = 0;
       let visibleSprites = 0;
       document.querySelectorAll(".sprite-group").forEach(group => {
@@ -1256,7 +1344,7 @@
           const matchesStatus = selectedStatus === "all"
             || (selectedStatus === "collected" && card.dataset.state !== "not-found")
             || card.dataset.state === selectedStatus;
-          const isVisible = matchesSearch && matchesStatus;
+          const isVisible = cardMatchesSelectedSeason(card) && matchesSearch && matchesStatus;
           card.hidden = !isVisible;
           if (isVisible) visibleCount += 1;
         });
@@ -1268,7 +1356,7 @@
       if (emptyResults) emptyResults.hidden = visibleGroups > 0;
       if (filterSummaryEl) {
         const queryText = terms.length > 0 ? ` matching "${escapeHtml(spriteSearch.value.trim())}"` : "";
-        filterSummaryEl.innerHTML = `Showing <b>${visibleSprites}</b> of <b>${checks.length}</b> sprites${queryText} in <b>${escapeHtml(currentStatusLabel())}</b>.`;
+        filterSummaryEl.innerHTML = `Showing <b>${visibleSprites}</b> of <b>${seasonCards.length}</b> sprites${queryText} in <b>${escapeHtml(currentStatusLabel())}</b> for <b>${escapeHtml(currentSeasonLabel())}</b>.`;
       }
       statFilterButtons.forEach(button => {
         const isActive = button.dataset.statusFilter === selectedStatus;
@@ -1284,6 +1372,12 @@
         if (event.key !== "Escape" || !spriteSearch.value) return;
         event.preventDefault();
         spriteSearch.value = "";
+        applyFilters();
+      });
+    }
+    if (seasonFilter) {
+      seasonFilter.addEventListener("change", () => {
+        updateProgress();
         applyFilters();
       });
     }
@@ -1425,9 +1519,10 @@
     }
 
     function updateProgress() {
-      const done = checks.filter(c => c.dataset.state !== "not-found").length;
-      const mastered = checks.filter(c => c.dataset.state === "mastered").length;
-      const total = checks.length;
+      const seasonCards = selectedSeasonCards();
+      const done = seasonCards.filter(c => c.dataset.state !== "not-found").length;
+      const mastered = seasonCards.filter(c => c.dataset.state === "mastered").length;
+      const total = seasonCards.length;
       const remaining = total - done;
       const percent = total > 0 ? Math.round((done / total) * 100) : 0;
       collectedCountEl.textContent = done;
@@ -1435,11 +1530,15 @@
       remainingCountEl.textContent = remaining;
       percentDoneEl.textContent = `${percent}%`;
       fillEl.style.width = `${percent}%`;
+      progressBarEl.setAttribute("aria-label", `${currentSeasonLabel()} checklist completion`);
       progressBarEl.setAttribute("aria-valuenow", String(percent));
-      progressBarEl.setAttribute("aria-valuetext", `${done} of ${total} sprites collected`);
-      if (resetAllButton) resetAllButton.disabled = done === 0;
+      progressBarEl.setAttribute("aria-valuetext", `${done} of ${total} sprites collected in ${currentSeasonLabel()}`);
+      if (resetAllButton) {
+        resetAllButton.disabled = done === 0;
+        resetAllButton.title = `Reset ${currentSeasonLabel()}`;
+      }
       document.querySelectorAll(".sprite-group").forEach(group => {
-        const groupCards = Array.from(group.querySelectorAll(".sprite-card"));
+        const groupCards = Array.from(group.querySelectorAll(".sprite-card")).filter(cardMatchesSelectedSeason);
         const groupDone = groupCards.filter(card => card.dataset.state !== "not-found").length;
         const groupCount = group.querySelector(".sprite-group-count");
         if (groupCount) groupCount.textContent = `${groupDone}/${groupCards.length}`;
@@ -1493,10 +1592,10 @@
       return SAVE_NAME.replace(".json", `-${new Date().toISOString().slice(0, 10)}.json`);
     }
 
-    function progressCounts() {
+    function progressCounts(cards = checks) {
       return {
-        collected: checks.filter(c => c.dataset.state !== "not-found").length,
-        mastered: checks.filter(c => c.dataset.state === "mastered").length
+        collected: cards.filter(c => c.dataset.state !== "not-found").length,
+        mastered: cards.filter(c => c.dataset.state === "mastered").length
       };
     }
 
@@ -1550,9 +1649,10 @@
     });
 
     onOptional("resetAll", "click", async () => {
-      const counts = progressCounts();
-      if (!confirm(`Clear ${counts.collected} collected sprite${counts.collected === 1 ? "" : "s"}?`)) return;
-      checks.forEach(c => updateSpriteState(c, "not-found"));
+      const cardsToReset = selectedSeasonCards();
+      const counts = progressCounts(cardsToReset);
+      if (!confirm(`Clear ${counts.collected} collected sprite${counts.collected === 1 ? "" : "s"} from ${currentSeasonLabel()}?`)) return;
+      cardsToReset.forEach(c => updateSpriteState(c, "not-found"));
       updateProgress();
       applyFilters();
       scheduleSave();

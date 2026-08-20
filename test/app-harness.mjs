@@ -232,12 +232,12 @@ function buildDocument() {
   const ids = [
     "spriteGroups", "emptyResults", "status", "filterSummary", "collectedCount",
     "masteredCount", "remainingCount", "percentDone", "progressBar", "fill",
-    "spriteSearch", "statusFilter", "clearFilters", "compactMode", "resetAll",
+    "spriteSearch", "seasonFilter", "statusFilter", "clearFilters", "compactMode", "resetAll",
     "siteCounter", "siteCounterImage", "siteCounterFallback", "exportFile",
     "importFileButton", "importFile"
   ];
   for (const id of ids) {
-    const tag = id === "statusFilter" ? "select" : id === "spriteSearch" || id === "importFile" ? "input" : id.includes("Button") || ["clearFilters", "compactMode", "resetAll", "exportFile"].includes(id) ? "button" : "div";
+    const tag = ["seasonFilter", "statusFilter"].includes(id) ? "select" : id === "spriteSearch" || id === "importFile" ? "input" : id.includes("Button") || ["clearFilters", "compactMode", "resetAll", "exportFile"].includes(id) ? "button" : "div";
     document.body.appendChild(new FakeElement(document, tag, id));
   }
 
@@ -247,6 +247,14 @@ function buildDocument() {
     ["found", "Found"], ["mastered", "Mastered"]
   ].map(([value, textContent]) => ({ value, textContent }));
   statusFilter.value = "all";
+
+  const seasonFilter = document.getElementById("seasonFilter");
+  seasonFilter.options = [
+    ["c7s4", "Chapter 7 Season 4 (Current)"],
+    ["c7s3", "Chapter 7 Season 3"],
+    ["all", "All seasons"]
+  ].map(([value, textContent]) => ({ value, textContent }));
+  seasonFilter.value = "c7s4";
 
   for (const status of ["collected", "mastered", "not-found", "collected"]) {
     const button = new FakeElement(document, "button");

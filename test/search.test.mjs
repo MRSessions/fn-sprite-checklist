@@ -5,6 +5,7 @@ import { createApp } from "./app-harness.mjs";
 
 test("does not treat status labels as sprite-name search terms", () => {
   const app = createApp();
+  app.document.getElementById("seasonFilter").value = "c7s3";
   app.evaluate('updateSpriteState(document.getElementById("water-sprite"), "found")');
   app.document.getElementById("spriteSearch").value = "found";
 
@@ -16,6 +17,7 @@ test("does not treat status labels as sprite-name search terms", () => {
 
 test("searches sprite names and families regardless of state", () => {
   const app = createApp();
+  app.document.getElementById("seasonFilter").value = "c7s3";
   app.evaluate('updateSpriteState(document.getElementById("water-sprite"), "found")');
   app.document.getElementById("spriteSearch").value = "water";
 
@@ -28,6 +30,7 @@ test("searches sprite names and families regardless of state", () => {
 
 test("combines name search with the dedicated status filter", () => {
   const app = createApp();
+  app.document.getElementById("seasonFilter").value = "c7s3";
   app.evaluate(`updateSpriteState(document.getElementById("water-sprite"), "found");
     updateSpriteState(document.getElementById("gold-water-sprite"), "mastered")`);
   app.document.getElementById("spriteSearch").value = "water";
