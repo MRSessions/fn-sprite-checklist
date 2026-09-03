@@ -5,19 +5,23 @@ import test from "node:test";
 
 import { createApp } from "./app-harness.mjs";
 
-test("matches the 153 released sprites and their Fortnite seasons", () => {
+test("matches the 164 released sprites and their Fortnite seasons", () => {
   const app = createApp();
   const catalog = JSON.parse(JSON.stringify(
     app.evaluate("sprites.map(({ id, name, src, seasons }) => ({ id, name, src, seasons }))")
   ));
 
-  assert.equal(catalog.length, 153);
-  assert.equal(new Set(catalog.map(sprite => sprite.id)).size, 153);
-  assert.equal(catalog.filter(sprite => sprite.seasons.includes("c7s4")).length, 36);
+  assert.equal(catalog.length, 164);
+  assert.equal(new Set(catalog.map(sprite => sprite.id)).size, 164);
+  assert.equal(catalog.filter(sprite => sprite.seasons.includes("c7s4")).length, 47);
   assert.equal(catalog.filter(sprite => sprite.seasons.includes("c7s3")).length, 117);
   assert.deepEqual(
     catalog.filter(sprite => sprite.seasons.includes("c7s4")).map(sprite => sprite.name),
     [
+      "Overshield Sprite", "Gold Overshield Sprite", "Cheat Master Overshield Sprite",
+      "Mega Man Sprite",
+      "X-Ray Sprite", "Gold X-Ray Sprite", "Cheat Master X-Ray Sprite",
+      "Onigiri Sprite", "Gold Onigiri Sprite", "Cheat Master Onigiri Sprite",
       "Jackrabbit Sprite", "Gold Jackrabbit Sprite", "Cheat Master Jackrabbit Sprite",
       "Shadow Sprite", "Gold Shadow Sprite", "Cheat Master Shadow Sprite",
       "Bush Sprite", "Gold Bush Sprite", "Cheat Master Bush Sprite",
@@ -27,7 +31,7 @@ test("matches the 153 released sprites and their Fortnite seasons", () => {
       "Klombo Sprite", "Gold Klombo Sprite", "Cheat Master Klombo Sprite",
       "Jonesy Sprite", "Gold Jonesy Sprite", "Cheat Master Jonesy Sprite",
       "Sonic Sprite", "Gold Sonic Sprite", "Cheat Master Sonic Sprite",
-      "Crown Sprite", "Gold Crown Sprite", "Cheat Master Crown Sprite",
+      "Crown Sprite", "Gold Crown Sprite", "Cheat Master Crown Sprite", "Loot Hacker Crown Sprite",
       "8-Bit Sprite", "Gold 8-Bit Sprite", "Cheat Master 8-Bit Sprite",
       "Storm Scout Sprite", "Gold Storm Scout Sprite", "Cheat Master Storm Scout Sprite"
     ]
@@ -55,8 +59,8 @@ test("matches the 153 released sprites and their Fortnite seasons", () => {
       "Holofoil Grim Sprite", "Cube Grim Sprite", "Gem Grim Sprite",
       "Air Sprite", "Holofoil Air Sprite", "Seven Sprite", "Holofoil Seven Sprite",
       "Llama Sprite", "Gold Llama Sprite", "Gummy Llama Sprite", "Galaxy Llama Sprite",
-      "Gem Llama Sprite", "Peely Sprite", "Gold Peely Sprite", "Gummy Peely Sprite",
-      "Galaxy Peely Sprite", "Holofoil Peely Sprite", "Pollo", "Vini Jr."
+      "Gem Llama Sprite", "Peeky Peely Sprite", "Gold Peeky Peely Sprite", "Gummy Peeky Peely Sprite",
+      "Galaxy Peeky Peely Sprite", "Holofoil Peeky Peely Sprite", "Pollo", "Vini Jr."
     ]
   );
 

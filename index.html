@@ -970,6 +970,10 @@
       ["Cheat Master ", "cheat-master-"]
     ];
     const SEASON_FOUR_FAMILIES = [
+      "Overshield",
+      "Mega Man",
+      "X-Ray",
+      "Onigiri",
       "Jackrabbit",
       "Shadow",
       "Bush",
@@ -983,6 +987,11 @@
       "8-Bit",
       "Storm Scout"
     ];
+    const SEASON_FOUR_BASE_ONLY_FAMILIES = new Set(["Mega Man"]);
+    const SEASON_FOUR_LOOT_HACKER_FAMILIES = new Set(["Crown"]);
+    const FAMILY_DISPLAY_NAMES = {
+      Peely: "Peeky Peely"
+    };
     const HOLOFOIL_FAMILIES = new Set([
       "Batman",
       "Water",
@@ -1094,7 +1103,13 @@
     const sprites = [
       ...SEASON_FOUR_FAMILIES.flatMap(family => {
         const base = slug(family);
-        return SEASON_FOUR_VARIANTS.map(([prefix, filePrefix]) => {
+        const familyVariants = SEASON_FOUR_BASE_ONLY_FAMILIES.has(family)
+          ? [["", ""]]
+          : [
+              ...SEASON_FOUR_VARIANTS,
+              ...(SEASON_FOUR_LOOT_HACKER_FAMILIES.has(family) ? [["Loot Hacker ", "loot-hacker-"]] : [])
+            ];
+        return familyVariants.map(([prefix, filePrefix]) => {
           const id = `${filePrefix}${base}-sprite`;
           return {
             id,
@@ -1111,6 +1126,7 @@
       }),
       ...SPRITE_FAMILIES.flatMap(family => {
         const base = slug(family);
+        const displayFamily = FAMILY_DISPLAY_NAMES[family] || family;
         const familyVariants = [
           ...VARIANTS,
           ...(HOLOFOIL_FAMILIES.has(family) ? [["Holofoil ", "holofoil-"]] : []),
@@ -1122,8 +1138,8 @@
           const id = `${filePrefix}${base}-sprite`;
           return {
             id,
-            family,
-            name: `${prefix}${family} Sprite`,
+            family: displayFamily,
+            name: `${prefix}${displayFamily} Sprite`,
             src: `sprites/${id}.webp`,
             seasons: [PREVIOUS_SEASON_ID]
           };
