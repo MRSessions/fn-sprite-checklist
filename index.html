@@ -988,7 +988,23 @@
       "Storm Scout"
     ];
     const SEASON_FOUR_BASE_ONLY_FAMILIES = new Set(["Mega Man"]);
-    const SEASON_FOUR_LOOT_HACKER_FAMILIES = new Set(["Crown"]);
+    const SEASON_FOUR_LOOT_HACKER_FAMILIES = new Set([
+      "Overshield",
+      "X-Ray",
+      "Onigiri",
+      "Jackrabbit",
+      "Shadow",
+      "Bush",
+      "Tails",
+      "Killswitch",
+      "Adventure",
+      "Klombo",
+      "Jonesy",
+      "Sonic",
+      "Crown",
+      "8-Bit",
+      "Storm Scout"
+    ]);
     const FAMILY_DISPLAY_NAMES = {
       Peely: "Peeky Peely"
     };
@@ -1111,10 +1127,11 @@
             ];
         return familyVariants.map(([prefix, filePrefix]) => {
           const id = `${filePrefix}${base}-sprite`;
+          const displayFamily = filePrefix === "loot-hacker-" && family === "Bush" ? "Bushranger" : family;
           return {
             id,
             family,
-            name: `${prefix}${family} Sprite`,
+            name: `${prefix}${displayFamily} Sprite`,
             src: `sprites/${id}.webp`,
             seasons: [CURRENT_SEASON_ID]
           };

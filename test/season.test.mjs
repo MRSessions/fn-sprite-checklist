@@ -11,10 +11,10 @@ test("defaults to the current season and scopes visible cards and stats", () => 
   const visibleCards = app.document.querySelectorAll(".sprite-card").filter(card => !card.hidden);
 
   assert.equal(app.document.getElementById("seasonFilter").value, "c7s4");
-  assert.equal(visibleCards.length, 47);
+  assert.equal(visibleCards.length, 61);
   assert.equal(visibleCards.every(card => card.dataset.seasons.includes("c7s4")), true);
-  assert.equal(app.document.getElementById("remainingCount").textContent, 47);
-  assert.match(app.document.getElementById("filterSummary").innerHTML, /of <b>47<\/b>/);
+  assert.equal(app.document.getElementById("remainingCount").textContent, 61);
+  assert.match(app.document.getElementById("filterSummary").innerHTML, /of <b>61<\/b>/);
   assert.match(app.document.getElementById("filterSummary").innerHTML, /Chapter 7 Season 4/);
 });
 
@@ -40,7 +40,7 @@ test("recalculates progress for each season and all seasons", async () => {
 
   assert.equal(app.document.getElementById("collectedCount").textContent, 2);
   assert.equal(app.document.getElementById("masteredCount").textContent, 1);
-  assert.equal(app.document.getElementById("remainingCount").textContent, 162);
+  assert.equal(app.document.getElementById("remainingCount").textContent, 176);
 });
 
 test("loads an existing 117-entry save without changing past progress", async () => {
@@ -109,7 +109,7 @@ test("supports a sprite tagged for more than one season", () => {
   app.evaluate("updateProgress(); applyFilters()");
 
   assert.equal(water.hidden, false);
-  assert.equal(app.document.getElementById("remainingCount").textContent, 48);
+  assert.equal(app.document.getElementById("remainingCount").textContent, 62);
 });
 
 test("exposes the season selector with an accessible label", () => {
