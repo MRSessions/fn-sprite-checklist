@@ -970,6 +970,9 @@
       ["Cheat Master ", "cheat-master-"]
     ];
     const SEASON_FOUR_FAMILIES = [
+      "Blinky",
+      "Crash Bandicoot",
+      "Pond",
       "Overshield",
       "Mega Man",
       "X-Ray",
@@ -989,6 +992,9 @@
     ];
     const SEASON_FOUR_BASE_ONLY_FAMILIES = new Set(["Mega Man"]);
     const SEASON_FOUR_LOOT_HACKER_FAMILIES = new Set([
+      "Blinky",
+      "Crash Bandicoot",
+      "Pond",
       "Overshield",
       "X-Ray",
       "Onigiri",
@@ -1005,6 +1011,7 @@
       "8-Bit",
       "Storm Scout"
     ]);
+    const SEASON_FOUR_BOUNTY_HUNTER_FAMILIES = new Set(["Crown"]);
     const FAMILY_DISPLAY_NAMES = {
       Peely: "Peeky Peely"
     };
@@ -1123,7 +1130,8 @@
           ? [["", ""]]
           : [
               ...SEASON_FOUR_VARIANTS,
-              ...(SEASON_FOUR_LOOT_HACKER_FAMILIES.has(family) ? [["Loot Hacker ", "loot-hacker-"]] : [])
+              ...(SEASON_FOUR_LOOT_HACKER_FAMILIES.has(family) ? [["Loot Hacker ", "loot-hacker-"]] : []),
+              ...(SEASON_FOUR_BOUNTY_HUNTER_FAMILIES.has(family) ? [["Bounty Hunter ", "bounty-hunter-"]] : [])
             ];
         return familyVariants.map(([prefix, filePrefix]) => {
           const id = `${filePrefix}${base}-sprite`;

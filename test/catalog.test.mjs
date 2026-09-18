@@ -5,19 +5,22 @@ import test from "node:test";
 
 import { createApp } from "./app-harness.mjs";
 
-test("matches the 178 released sprites and their Fortnite seasons", () => {
+test("matches the 191 released sprites and their Fortnite seasons", () => {
   const app = createApp();
   const catalog = JSON.parse(JSON.stringify(
     app.evaluate("sprites.map(({ id, name, src, seasons }) => ({ id, name, src, seasons }))")
   ));
 
-  assert.equal(catalog.length, 178);
-  assert.equal(new Set(catalog.map(sprite => sprite.id)).size, 178);
-  assert.equal(catalog.filter(sprite => sprite.seasons.includes("c7s4")).length, 61);
+  assert.equal(catalog.length, 191);
+  assert.equal(new Set(catalog.map(sprite => sprite.id)).size, 191);
+  assert.equal(catalog.filter(sprite => sprite.seasons.includes("c7s4")).length, 74);
   assert.equal(catalog.filter(sprite => sprite.seasons.includes("c7s3")).length, 117);
   assert.deepEqual(
     catalog.filter(sprite => sprite.seasons.includes("c7s4")).map(sprite => sprite.name),
     [
+      "Blinky Sprite", "Gold Blinky Sprite", "Cheat Master Blinky Sprite", "Loot Hacker Blinky Sprite",
+      "Crash Bandicoot Sprite", "Gold Crash Bandicoot Sprite", "Cheat Master Crash Bandicoot Sprite", "Loot Hacker Crash Bandicoot Sprite",
+      "Pond Sprite", "Gold Pond Sprite", "Cheat Master Pond Sprite", "Loot Hacker Pond Sprite",
       "Overshield Sprite", "Gold Overshield Sprite", "Cheat Master Overshield Sprite", "Loot Hacker Overshield Sprite",
       "Mega Man Sprite",
       "X-Ray Sprite", "Gold X-Ray Sprite", "Cheat Master X-Ray Sprite", "Loot Hacker X-Ray Sprite",
@@ -31,7 +34,7 @@ test("matches the 178 released sprites and their Fortnite seasons", () => {
       "Klombo Sprite", "Gold Klombo Sprite", "Cheat Master Klombo Sprite", "Loot Hacker Klombo Sprite",
       "Jonesy Sprite", "Gold Jonesy Sprite", "Cheat Master Jonesy Sprite", "Loot Hacker Jonesy Sprite",
       "Sonic Sprite", "Gold Sonic Sprite", "Cheat Master Sonic Sprite", "Loot Hacker Sonic Sprite",
-      "Crown Sprite", "Gold Crown Sprite", "Cheat Master Crown Sprite", "Loot Hacker Crown Sprite",
+      "Crown Sprite", "Gold Crown Sprite", "Cheat Master Crown Sprite", "Loot Hacker Crown Sprite", "Bounty Hunter Crown Sprite",
       "8-Bit Sprite", "Gold 8-Bit Sprite", "Cheat Master 8-Bit Sprite", "Loot Hacker 8-Bit Sprite",
       "Storm Scout Sprite", "Gold Storm Scout Sprite", "Cheat Master Storm Scout Sprite", "Loot Hacker Storm Scout Sprite"
     ]
