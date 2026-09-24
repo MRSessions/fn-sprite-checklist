@@ -41,3 +41,23 @@ test("combines name search with the dedicated status filter", () => {
   const visibleCards = app.document.querySelectorAll(".sprite-card").filter(card => !card.hidden);
   assert.deepEqual(visibleCards.map(card => card.id), ["water-sprite"]);
 });
+
+test("finds Body Slam by its released name and its Crash Bandicoot family", () => {
+  const app = createApp();
+  const search = app.document.getElementById("spriteSearch");
+  search.value = "body slam";
+  app.evaluate("applyFilters()");
+
+  let visibleCards = app.document.querySelectorAll(".sprite-card").filter(card => !card.hidden);
+  assert.deepEqual(visibleCards.map(card => card.id), ["bounty-hunter-body-slam-sprite"]);
+  assert.equal(visibleCards[0].dataset.name, "Bounty Hunter Body Slam Sprite");
+
+  search.value = "crash bandicoot";
+  app.evaluate("applyFilters()");
+
+  visibleCards = app.document.querySelectorAll(".sprite-card").filter(card => !card.hidden);
+  assert.deepEqual(visibleCards.map(card => card.id), [
+    "crash-bandicoot-sprite", "gold-crash-bandicoot-sprite", "cheat-master-crash-bandicoot-sprite",
+    "loot-hacker-crash-bandicoot-sprite", "bounty-hunter-body-slam-sprite"
+  ]);
+});

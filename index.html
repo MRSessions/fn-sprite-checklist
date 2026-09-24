@@ -970,6 +970,7 @@
       ["Cheat Master ", "cheat-master-"]
     ];
     const SEASON_FOUR_FAMILIES = [
+      "Morgana",
       "Blinky",
       "Crash Bandicoot",
       "Pond",
@@ -992,6 +993,7 @@
     ];
     const SEASON_FOUR_BASE_ONLY_FAMILIES = new Set(["Mega Man"]);
     const SEASON_FOUR_LOOT_HACKER_FAMILIES = new Set([
+      "Morgana",
       "Blinky",
       "Crash Bandicoot",
       "Pond",
@@ -1011,7 +1013,27 @@
       "8-Bit",
       "Storm Scout"
     ]);
-    const SEASON_FOUR_BOUNTY_HUNTER_FAMILIES = new Set(["Crown"]);
+    const SEASON_FOUR_BOUNTY_HUNTER_FAMILIES = new Set([
+      "Morgana",
+      "Blinky",
+      "Crash Bandicoot",
+      "Pond",
+      "Overshield",
+      "X-Ray",
+      "Onigiri",
+      "Jackrabbit",
+      "Shadow",
+      "Bush",
+      "Tails",
+      "Killswitch",
+      "Adventure",
+      "Klombo",
+      "Jonesy",
+      "Sonic",
+      "Crown",
+      "8-Bit",
+      "Storm Scout"
+    ]);
     const FAMILY_DISPLAY_NAMES = {
       Peely: "Peeky Peely"
     };
@@ -1134,8 +1156,10 @@
               ...(SEASON_FOUR_BOUNTY_HUNTER_FAMILIES.has(family) ? [["Bounty Hunter ", "bounty-hunter-"]] : [])
             ];
         return familyVariants.map(([prefix, filePrefix]) => {
-          const id = `${filePrefix}${base}-sprite`;
-          const displayFamily = filePrefix === "loot-hacker-" && family === "Bush" ? "Bushranger" : family;
+          const isBodySlam = filePrefix === "bounty-hunter-" && family === "Crash Bandicoot";
+          const id = `${filePrefix}${isBodySlam ? "body-slam" : base}-sprite`;
+          const displayFamily = isBodySlam ? "Body Slam"
+            : filePrefix === "loot-hacker-" && family === "Bush" ? "Bushranger" : family;
           return {
             id,
             family,
