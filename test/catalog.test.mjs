@@ -5,19 +5,20 @@ import test from "node:test";
 
 import { createApp } from "./app-harness.mjs";
 
-test("matches the 213 released sprites and their Fortnite seasons", () => {
+test("matches the 218 released sprites and their Fortnite seasons", () => {
   const app = createApp();
   const catalog = JSON.parse(JSON.stringify(
     app.evaluate("sprites.map(({ id, name, src, seasons }) => ({ id, name, src, seasons }))")
   ));
 
-  assert.equal(catalog.length, 213);
-  assert.equal(new Set(catalog.map(sprite => sprite.id)).size, 213);
-  assert.equal(catalog.filter(sprite => sprite.seasons.includes("c7s4")).length, 96);
+  assert.equal(catalog.length, 218);
+  assert.equal(new Set(catalog.map(sprite => sprite.id)).size, 218);
+  assert.equal(catalog.filter(sprite => sprite.seasons.includes("c7s4")).length, 101);
   assert.equal(catalog.filter(sprite => sprite.seasons.includes("c7s3")).length, 117);
   assert.deepEqual(
     catalog.filter(sprite => sprite.seasons.includes("c7s4")).map(sprite => sprite.name),
     [
+      "Birthday Sprite", "Gold Birthday Sprite", "Cheat Master Birthday Sprite", "Loot Hacker Birthday Sprite", "Bounty Hunter Birthday Sprite",
       "Morgana Sprite", "Gold Morgana Sprite", "Cheat Master Morgana Sprite", "Loot Hacker Morgana Sprite", "Bounty Hunter Morgana Sprite",
       "Blinky Sprite", "Gold Blinky Sprite", "Cheat Master Blinky Sprite", "Loot Hacker Blinky Sprite", "Bounty Hunter Blinky Sprite",
       "Crash Bandicoot Sprite", "Gold Crash Bandicoot Sprite", "Cheat Master Crash Bandicoot Sprite", "Loot Hacker Crash Bandicoot Sprite", "Bounty Hunter Body Slam Sprite",
