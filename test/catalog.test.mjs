@@ -5,19 +5,23 @@ import test from "node:test";
 
 import { createApp } from "./app-harness.mjs";
 
-test("matches the 218 released sprites and their Fortnite seasons", () => {
+test("matches the 239 released sprites and their Fortnite seasons", () => {
   const app = createApp();
   const catalog = JSON.parse(JSON.stringify(
     app.evaluate("sprites.map(({ id, name, src, seasons }) => ({ id, name, src, seasons }))")
   ));
 
-  assert.equal(catalog.length, 218);
-  assert.equal(new Set(catalog.map(sprite => sprite.id)).size, 218);
-  assert.equal(catalog.filter(sprite => sprite.seasons.includes("c7s4")).length, 101);
+  assert.equal(catalog.length, 239);
+  assert.equal(new Set(catalog.map(sprite => sprite.id)).size, 239);
+  assert.equal(catalog.filter(sprite => sprite.seasons.includes("c7s4")).length, 122);
   assert.equal(catalog.filter(sprite => sprite.seasons.includes("c7s3")).length, 117);
   assert.deepEqual(
     catalog.filter(sprite => sprite.seasons.includes("c7s4")).map(sprite => sprite.name),
     [
+      "Spooky Dash Sprite", "Gold Spooky Dash Sprite", "Cheat Master Spooky Dash Sprite", "Loot Hacker Spooky Dash Sprite", "Bounty Hunter Spooky Dash Sprite",
+      "Vampire Sprite", "Gold Vampire Sprite", "Cheat Master Vampire Sprite", "Loot Hacker Vampire Sprite", "Bounty Hunter Vampire Sprite",
+      "The Deer Sprite", "Gold The Deer Sprite", "Cheat Master The Deer Sprite", "Loot Hacker The Deer Sprite", "Bounty Hunter The Deer Sprite",
+      "Dumpster Dive Sprite", "Gold Dumpster Dive Sprite", "Cheat Master Dumpster Dive Sprite", "Loot Hacker Dumpster Dive Sprite", "Bounty Hunter Dumpster Dive Sprite",
       "Birthday Sprite", "Gold Birthday Sprite", "Cheat Master Birthday Sprite", "Loot Hacker Birthday Sprite", "Bounty Hunter Birthday Sprite",
       "Morgana Sprite", "Gold Morgana Sprite", "Cheat Master Morgana Sprite", "Loot Hacker Morgana Sprite", "Bounty Hunter Morgana Sprite",
       "Blinky Sprite", "Gold Blinky Sprite", "Cheat Master Blinky Sprite", "Loot Hacker Blinky Sprite", "Bounty Hunter Blinky Sprite",
@@ -36,7 +40,7 @@ test("matches the 218 released sprites and their Fortnite seasons", () => {
       "Klombo Sprite", "Gold Klombo Sprite", "Cheat Master Klombo Sprite", "Loot Hacker Klombo Sprite", "Bounty Hunter Klombo Sprite",
       "Jonesy Sprite", "Gold Jonesy Sprite", "Cheat Master Jonesy Sprite", "Loot Hacker Jonesy Sprite", "Bounty Hunter Jonesy Sprite",
       "Sonic Sprite", "Gold Sonic Sprite", "Cheat Master Sonic Sprite", "Loot Hacker Sonic Sprite", "Bounty Hunter Sonic Sprite",
-      "Crown Sprite", "Gold Crown Sprite", "Cheat Master Crown Sprite", "Loot Hacker Crown Sprite", "Bounty Hunter Crown Sprite",
+      "Crown Sprite", "Gold Crown Sprite", "Cheat Master Crown Sprite", "Loot Hacker Crown Sprite", "Bounty Hunter Crown Sprite", "Trick or Treat Crown Sprite",
       "8-Bit Sprite", "Gold 8-Bit Sprite", "Cheat Master 8-Bit Sprite", "Loot Hacker 8-Bit Sprite", "Bounty Hunter 8-Bit Sprite",
       "Storm Scout Sprite", "Gold Storm Scout Sprite", "Cheat Master Storm Scout Sprite", "Loot Hacker Storm Scout Sprite", "Bounty Hunter Storm Scout Sprite"
     ]
@@ -74,4 +78,17 @@ test("matches the 218 released sprites and their Fortnite seasons", () => {
     .filter(file => file.endsWith(".webp"))
     .sort();
   assert.deepEqual(imageFiles, manifestFiles);
+});
+
+test("includes only the released Crown sprite in the Trick or Treat variant", () => {
+  const app = createApp();
+  const trickOrTreatSprites = JSON.parse(JSON.stringify(
+    app.evaluate('sprites.filter(sprite => sprite.name.startsWith("Trick or Treat ")).map(({ id, name, seasons }) => ({ id, name, seasons }))')
+  ));
+
+  assert.deepEqual(trickOrTreatSprites, [{
+    id: "trick-or-treat-crown-sprite",
+    name: "Trick or Treat Crown Sprite",
+    seasons: ["c7s4"]
+  }]);
 });
