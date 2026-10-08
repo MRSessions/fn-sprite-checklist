@@ -1049,7 +1049,32 @@
       "8-Bit",
       "Storm Scout"
     ]);
-    const SEASON_FOUR_TRICK_OR_TREAT_FAMILIES = new Set(["Crown"]);
+    const SEASON_FOUR_TRICK_OR_TREAT_FAMILIES = new Set([
+      "Spooky Dash",
+      "Vampire",
+      "The Deer",
+      "Dumpster Dive",
+      "Birthday",
+      "Morgana",
+      "Blinky",
+      "Crash Bandicoot",
+      "Pond",
+      "Overshield",
+      "X-Ray",
+      "Onigiri",
+      "Jackrabbit",
+      "Shadow",
+      "Bush",
+      "Tails",
+      "Killswitch",
+      "Adventure",
+      "Klombo",
+      "Jonesy",
+      "Sonic",
+      "Crown",
+      "8-Bit",
+      "Storm Scout"
+    ]);
     const FAMILY_DISPLAY_NAMES = {
       Peely: "Peeky Peely"
     };
@@ -1173,10 +1198,11 @@
               ...(SEASON_FOUR_TRICK_OR_TREAT_FAMILIES.has(family) ? [["Trick or Treat ", "trick-or-treat-"]] : [])
             ];
         return familyVariants.map(([prefix, filePrefix]) => {
+          // Retain the original ID for saved Bounty Hunter Crash Bandicoot progress.
           const isBodySlam = filePrefix === "bounty-hunter-" && family === "Crash Bandicoot";
           const id = `${filePrefix}${isBodySlam ? "body-slam" : base}-sprite`;
-          const displayFamily = isBodySlam ? "Body Slam"
-            : filePrefix === "loot-hacker-" && family === "Bush" ? "Bushranger" : family;
+          const displayFamily = ["loot-hacker-", "trick-or-treat-"].includes(filePrefix) && family === "Bush"
+            ? "Bushranger" : family;
           return {
             id,
             family,

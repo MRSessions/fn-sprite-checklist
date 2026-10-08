@@ -11,10 +11,10 @@ test("defaults to the current season and scopes visible cards and stats", () => 
   const visibleCards = app.document.querySelectorAll(".sprite-card").filter(card => !card.hidden);
 
   assert.equal(app.document.getElementById("seasonFilter").value, "c7s4");
-  assert.equal(visibleCards.length, 122);
+  assert.equal(visibleCards.length, 145);
   assert.equal(visibleCards.every(card => card.dataset.seasons.includes("c7s4")), true);
-  assert.equal(app.document.getElementById("remainingCount").textContent, 122);
-  assert.match(app.document.getElementById("filterSummary").innerHTML, /of <b>122<\/b>/);
+  assert.equal(app.document.getElementById("remainingCount").textContent, 145);
+  assert.match(app.document.getElementById("filterSummary").innerHTML, /of <b>145<\/b>/);
   assert.match(app.document.getElementById("filterSummary").innerHTML, /Chapter 7 Season 4/);
 });
 
@@ -40,7 +40,7 @@ test("recalculates progress for each season and all seasons", async () => {
 
   assert.equal(app.document.getElementById("collectedCount").textContent, 2);
   assert.equal(app.document.getElementById("masteredCount").textContent, 1);
-  assert.equal(app.document.getElementById("remainingCount").textContent, 237);
+  assert.equal(app.document.getElementById("remainingCount").textContent, 260);
 });
 
 test("loads an existing 117-entry save without changing past progress", async () => {
@@ -71,32 +71,38 @@ test("loads an existing 117-entry save without changing past progress", async ()
   assert.equal(expandedSave.states["jackrabbit-sprite"], "not-found");
 });
 
-test("preserves all 218 existing sprite IDs, order, and saved states when adding 21 releases", () => {
+test("preserves all 239 existing sprite IDs, order, and saved states when adding 23 releases", () => {
   const previousIds = JSON.parse(fs.readFileSync(
-    new URL("./fixtures/2026-09-26-sprite-ids.json", import.meta.url), "utf8"
+    new URL("./fixtures/2026-10-01-sprite-ids.json", import.meta.url), "utf8"
   ));
   const addedIds = [
-    "spooky-dash-sprite", "gold-spooky-dash-sprite", "cheat-master-spooky-dash-sprite",
-    "loot-hacker-spooky-dash-sprite", "bounty-hunter-spooky-dash-sprite",
-    "vampire-sprite", "gold-vampire-sprite", "cheat-master-vampire-sprite",
-    "loot-hacker-vampire-sprite", "bounty-hunter-vampire-sprite",
-    "the-deer-sprite", "gold-the-deer-sprite", "cheat-master-the-deer-sprite",
-    "loot-hacker-the-deer-sprite", "bounty-hunter-the-deer-sprite",
-    "dumpster-dive-sprite", "gold-dumpster-dive-sprite", "cheat-master-dumpster-dive-sprite",
-    "loot-hacker-dumpster-dive-sprite", "bounty-hunter-dumpster-dive-sprite",
-    "trick-or-treat-crown-sprite"
+    "trick-or-treat-spooky-dash-sprite", "trick-or-treat-vampire-sprite",
+    "trick-or-treat-the-deer-sprite", "trick-or-treat-dumpster-dive-sprite",
+    "trick-or-treat-birthday-sprite", "trick-or-treat-morgana-sprite",
+    "trick-or-treat-blinky-sprite", "trick-or-treat-crash-bandicoot-sprite",
+    "trick-or-treat-pond-sprite", "trick-or-treat-overshield-sprite",
+    "trick-or-treat-x-ray-sprite", "trick-or-treat-onigiri-sprite",
+    "trick-or-treat-jackrabbit-sprite", "trick-or-treat-shadow-sprite",
+    "trick-or-treat-bush-sprite", "trick-or-treat-tails-sprite",
+    "trick-or-treat-killswitch-sprite", "trick-or-treat-adventure-sprite",
+    "trick-or-treat-klombo-sprite", "trick-or-treat-jonesy-sprite",
+    "trick-or-treat-sonic-sprite", "trick-or-treat-8-bit-sprite",
+    "trick-or-treat-storm-scout-sprite"
   ];
   const states = Object.fromEntries(previousIds.map((id, index) => [
     id, ["not-found", "found", "mastered"][index % 3]
   ]));
+  states["bounty-hunter-body-slam-sprite"] = "mastered";
   const app = createApp({ storage: { [SAVE_KEY]: JSON.stringify({ version: 3, states }) } });
   const currentIds = Array.from(app.evaluate("sprites.map(sprite => sprite.id)"));
 
-  assert.equal(previousIds.length, 218);
+  assert.equal(previousIds.length, 239);
   assert.deepEqual(currentIds.filter(id => previousIds.includes(id)), previousIds);
   assert.deepEqual(currentIds.filter(id => !previousIds.includes(id)), addedIds);
   const expandedSave = JSON.parse(app.localStorage.getItem(SAVE_KEY));
-  assert.equal(Object.keys(expandedSave.states).length, 239);
+  assert.equal(Object.keys(expandedSave.states).length, 262);
+  assert.equal(app.card("bounty-hunter-body-slam-sprite").dataset.name, "Bounty Hunter Crash Bandicoot Sprite");
+  assert.equal(app.card("bounty-hunter-body-slam-sprite").dataset.state, "mastered");
   for (const [id, state] of Object.entries(states)) {
     assert.equal(app.card(id).dataset.state, state, `${id} retained its displayed state`);
     assert.equal(expandedSave.states[id], state, `${id} retained its saved state`);
@@ -145,7 +151,7 @@ test("supports a sprite tagged for more than one season", () => {
   app.evaluate("updateProgress(); applyFilters()");
 
   assert.equal(water.hidden, false);
-  assert.equal(app.document.getElementById("remainingCount").textContent, 123);
+  assert.equal(app.document.getElementById("remainingCount").textContent, 146);
 });
 
 test("exposes the season selector with an accessible label", () => {
