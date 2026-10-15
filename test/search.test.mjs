@@ -63,26 +63,21 @@ test("finds Bounty Hunter Crash Bandicoot by its released name while retaining i
   ]);
 });
 
-test("finds Bushranger by its released names and its stable Bush family", () => {
+test("finds all seven released Bush variants under their stable IDs", () => {
   const app = createApp();
   const search = app.document.getElementById("spriteSearch");
-  search.value = "bushranger";
-  app.evaluate("applyFilters()");
-
-  let visibleCards = app.document.querySelectorAll(".sprite-card").filter(card => !card.hidden);
-  assert.deepEqual(visibleCards.map(card => card.id), [
-    "loot-hacker-bush-sprite", "trick-or-treat-bush-sprite"
-  ]);
-  assert.deepEqual(visibleCards.map(card => card.dataset.name), [
-    "Loot Hacker Bushranger Sprite", "Trick or Treat Bushranger Sprite"
-  ]);
-
   search.value = "bush";
   app.evaluate("applyFilters()");
 
-  visibleCards = app.document.querySelectorAll(".sprite-card").filter(card => !card.hidden);
+  const visibleCards = app.document.querySelectorAll(".sprite-card").filter(card => !card.hidden);
   assert.deepEqual(visibleCards.map(card => card.id), [
     "bush-sprite", "gold-bush-sprite", "cheat-master-bush-sprite",
-    "loot-hacker-bush-sprite", "bounty-hunter-bush-sprite", "trick-or-treat-bush-sprite"
+    "loot-hacker-bush-sprite", "bounty-hunter-bush-sprite", "trick-or-treat-bush-sprite",
+    "quack-bush-sprite"
+  ]);
+  assert.deepEqual(visibleCards.map(card => card.dataset.name), [
+    "Bush Sprite", "Gold Bush Sprite", "Cheat Master Bush Sprite",
+    "Loot Hacker Bush Sprite", "Bounty Hunter Bush Sprite", "Trick or Treat Bush Sprite",
+    "Quack Bush Sprite"
   ]);
 });

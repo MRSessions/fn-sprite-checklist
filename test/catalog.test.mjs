@@ -5,20 +5,22 @@ import test from "node:test";
 
 import { createApp } from "./app-harness.mjs";
 
-test("matches the 262 released sprites and their Fortnite seasons", () => {
+test("matches the 279 released sprites and their Fortnite seasons", () => {
   const app = createApp();
   const catalog = JSON.parse(JSON.stringify(
     app.evaluate("sprites.map(({ id, name, src, seasons }) => ({ id, name, src, seasons }))")
   ));
 
-  assert.equal(catalog.length, 262);
-  assert.equal(new Set(catalog.map(sprite => sprite.id)).size, 262);
-  assert.equal(catalog.filter(sprite => sprite.seasons.includes("c7s4")).length, 145);
+  assert.equal(catalog.length, 279);
+  assert.equal(new Set(catalog.map(sprite => sprite.id)).size, 279);
+  assert.equal(catalog.filter(sprite => sprite.seasons.includes("c7s4")).length, 162);
   assert.equal(catalog.filter(sprite => sprite.seasons.includes("c7s3")).length, 117);
   assert.deepEqual(
     catalog.filter(sprite => sprite.seasons.includes("c7s4")).map(sprite => sprite.name),
     [
-      "Spooky Dash Sprite", "Gold Spooky Dash Sprite", "Cheat Master Spooky Dash Sprite", "Loot Hacker Spooky Dash Sprite", "Bounty Hunter Spooky Dash Sprite", "Trick or Treat Spooky Dash Sprite",
+      "Honey Sprite", "Gold Honey Sprite", "Cheat Master Honey Sprite", "Loot Hacker Honey Sprite", "Bounty Hunter Honey Sprite", "Trick or Treat Honey Sprite",
+      "One Wish Willow Sprite", "Gold One Wish Willow Sprite", "Cheat Master One Wish Willow Sprite", "Loot Hacker One Wish Willow Sprite", "Bounty Hunter One Wish Willow Sprite", "Trick or Treat One Wish Willow Sprite",
+      "Spooky Dash Sprite", "Gold Spooky Dash Sprite", "Cheat Master Spooky Dash Sprite", "Loot Hacker Spooky Dash Sprite", "Bounty Hunter Spooky Dash Sprite", "Trick or Treat Spooky Dash Sprite", "Quack Spooky Dash Sprite",
       "Vampire Sprite", "Gold Vampire Sprite", "Cheat Master Vampire Sprite", "Loot Hacker Vampire Sprite", "Bounty Hunter Vampire Sprite", "Trick or Treat Vampire Sprite",
       "The Deer Sprite", "Gold The Deer Sprite", "Cheat Master The Deer Sprite", "Loot Hacker The Deer Sprite", "Bounty Hunter The Deer Sprite", "Trick or Treat The Deer Sprite",
       "Dumpster Dive Sprite", "Gold Dumpster Dive Sprite", "Cheat Master Dumpster Dive Sprite", "Loot Hacker Dumpster Dive Sprite", "Bounty Hunter Dumpster Dive Sprite", "Trick or Treat Dumpster Dive Sprite",
@@ -33,12 +35,12 @@ test("matches the 262 released sprites and their Fortnite seasons", () => {
       "Onigiri Sprite", "Gold Onigiri Sprite", "Cheat Master Onigiri Sprite", "Loot Hacker Onigiri Sprite", "Bounty Hunter Onigiri Sprite", "Trick or Treat Onigiri Sprite",
       "Jackrabbit Sprite", "Gold Jackrabbit Sprite", "Cheat Master Jackrabbit Sprite", "Loot Hacker Jackrabbit Sprite", "Bounty Hunter Jackrabbit Sprite", "Trick or Treat Jackrabbit Sprite",
       "Shadow Sprite", "Gold Shadow Sprite", "Cheat Master Shadow Sprite", "Loot Hacker Shadow Sprite", "Bounty Hunter Shadow Sprite", "Trick or Treat Shadow Sprite",
-      "Bush Sprite", "Gold Bush Sprite", "Cheat Master Bush Sprite", "Loot Hacker Bushranger Sprite", "Bounty Hunter Bush Sprite", "Trick or Treat Bushranger Sprite",
+      "Bush Sprite", "Gold Bush Sprite", "Cheat Master Bush Sprite", "Loot Hacker Bush Sprite", "Bounty Hunter Bush Sprite", "Trick or Treat Bush Sprite", "Quack Bush Sprite",
       "Tails Sprite", "Gold Tails Sprite", "Cheat Master Tails Sprite", "Loot Hacker Tails Sprite", "Bounty Hunter Tails Sprite", "Trick or Treat Tails Sprite",
       "Killswitch Sprite", "Gold Killswitch Sprite", "Cheat Master Killswitch Sprite", "Loot Hacker Killswitch Sprite", "Bounty Hunter Killswitch Sprite", "Trick or Treat Killswitch Sprite",
-      "Adventure Sprite", "Gold Adventure Sprite", "Cheat Master Adventure Sprite", "Loot Hacker Adventure Sprite", "Bounty Hunter Adventure Sprite", "Trick or Treat Adventure Sprite",
-      "Klombo Sprite", "Gold Klombo Sprite", "Cheat Master Klombo Sprite", "Loot Hacker Klombo Sprite", "Bounty Hunter Klombo Sprite", "Trick or Treat Klombo Sprite",
-      "Jonesy Sprite", "Gold Jonesy Sprite", "Cheat Master Jonesy Sprite", "Loot Hacker Jonesy Sprite", "Bounty Hunter Jonesy Sprite", "Trick or Treat Jonesy Sprite",
+      "Adventure Sprite", "Gold Adventure Sprite", "Cheat Master Adventure Sprite", "Loot Hacker Adventure Sprite", "Bounty Hunter Adventure Sprite", "Trick or Treat Adventure Sprite", "Quack Adventure Sprite",
+      "Klombo Sprite", "Gold Klombo Sprite", "Cheat Master Klombo Sprite", "Loot Hacker Klombo Sprite", "Bounty Hunter Klombo Sprite", "Trick or Treat Klombo Sprite", "Quack Klombo Sprite",
+      "Jonesy Sprite", "Gold Jonesy Sprite", "Cheat Master Jonesy Sprite", "Loot Hacker Jonesy Sprite", "Bounty Hunter Jonesy Sprite", "Trick or Treat Jonesy Sprite", "Quack Jonesy Sprite",
       "Sonic Sprite", "Gold Sonic Sprite", "Cheat Master Sonic Sprite", "Loot Hacker Sonic Sprite", "Bounty Hunter Sonic Sprite", "Trick or Treat Sonic Sprite",
       "Crown Sprite", "Gold Crown Sprite", "Cheat Master Crown Sprite", "Loot Hacker Crown Sprite", "Bounty Hunter Crown Sprite", "Trick or Treat Crown Sprite",
       "8-Bit Sprite", "Gold 8-Bit Sprite", "Cheat Master 8-Bit Sprite", "Loot Hacker 8-Bit Sprite", "Bounty Hunter 8-Bit Sprite", "Trick or Treat 8-Bit Sprite",
@@ -80,13 +82,14 @@ test("matches the 262 released sprites and their Fortnite seasons", () => {
   assert.deepEqual(imageFiles, manifestFiles);
 });
 
-test("includes exactly the 24 released Trick or Treat sprites", () => {
+test("includes exactly the 26 released Trick or Treat sprites", () => {
   const app = createApp();
   const trickOrTreatSprites = JSON.parse(JSON.stringify(
     app.evaluate('sprites.filter(sprite => sprite.name.startsWith("Trick or Treat ")).map(({ id, name, seasons }) => ({ id, name, seasons }))')
   ));
 
   assert.deepEqual(trickOrTreatSprites.map(sprite => sprite.name), [
+    "Trick or Treat Honey Sprite", "Trick or Treat One Wish Willow Sprite",
     "Trick or Treat Spooky Dash Sprite", "Trick or Treat Vampire Sprite",
     "Trick or Treat The Deer Sprite", "Trick or Treat Dumpster Dive Sprite",
     "Trick or Treat Birthday Sprite", "Trick or Treat Morgana Sprite",
@@ -94,11 +97,26 @@ test("includes exactly the 24 released Trick or Treat sprites", () => {
     "Trick or Treat Pond Sprite", "Trick or Treat Overshield Sprite",
     "Trick or Treat X-Ray Sprite", "Trick or Treat Onigiri Sprite",
     "Trick or Treat Jackrabbit Sprite", "Trick or Treat Shadow Sprite",
-    "Trick or Treat Bushranger Sprite", "Trick or Treat Tails Sprite",
+    "Trick or Treat Bush Sprite", "Trick or Treat Tails Sprite",
     "Trick or Treat Killswitch Sprite", "Trick or Treat Adventure Sprite",
     "Trick or Treat Klombo Sprite", "Trick or Treat Jonesy Sprite",
     "Trick or Treat Sonic Sprite", "Trick or Treat Crown Sprite",
     "Trick or Treat 8-Bit Sprite", "Trick or Treat Storm Scout Sprite"
   ]);
   assert.equal(trickOrTreatSprites.every(sprite => sprite.seasons.length === 1 && sprite.seasons[0] === "c7s4"), true);
+});
+
+test("includes exactly the five released current-season Quack sprites", () => {
+  const app = createApp();
+  const currentQuackSprites = JSON.parse(JSON.stringify(
+    app.evaluate('sprites.filter(sprite => sprite.name.startsWith("Quack ") && sprite.seasons.includes("c7s4")).map(({ id, name, seasons }) => ({ id, name, seasons }))')
+  ));
+
+  assert.deepEqual(currentQuackSprites, [
+    { id: "quack-spooky-dash-sprite", name: "Quack Spooky Dash Sprite", seasons: ["c7s4"] },
+    { id: "quack-bush-sprite", name: "Quack Bush Sprite", seasons: ["c7s4"] },
+    { id: "quack-adventure-sprite", name: "Quack Adventure Sprite", seasons: ["c7s4"] },
+    { id: "quack-klombo-sprite", name: "Quack Klombo Sprite", seasons: ["c7s4"] },
+    { id: "quack-jonesy-sprite", name: "Quack Jonesy Sprite", seasons: ["c7s4"] }
+  ]);
 });
