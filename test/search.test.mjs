@@ -44,6 +44,7 @@ test("combines name search with the dedicated status filter", () => {
 
 test("finds Bounty Hunter Crash Bandicoot by its released name while retaining its saved ID", () => {
   const app = createApp();
+  app.document.getElementById("seasonFilter").value = "c7s4";
   const search = app.document.getElementById("spriteSearch");
   search.value = "bounty hunter crash bandicoot";
   app.evaluate("applyFilters()");
@@ -65,6 +66,7 @@ test("finds Bounty Hunter Crash Bandicoot by its released name while retaining i
 
 test("finds all seven released Bush variants under their stable IDs", () => {
   const app = createApp();
+  app.document.getElementById("seasonFilter").value = "c7s4";
   const search = app.document.getElementById("spriteSearch");
   search.value = "bush";
   app.evaluate("applyFilters()");
@@ -80,4 +82,25 @@ test("finds all seven released Bush variants under their stable IDs", () => {
     "Loot Hacker Bush Sprite", "Bounty Hunter Bush Sprite", "Trick or Treat Bush Sprite",
     "Quack Bush Sprite"
   ]);
+});
+
+test("searches the current Mini Season Fortune names and respects older season boundaries", () => {
+  const app = createApp();
+  const search = app.document.getElementById("spriteSearch");
+  search.value = "fortune";
+  app.evaluate("applyFilters()");
+
+  let visibleCards = app.document.querySelectorAll(".sprite-card").filter(card => !card.hidden);
+  assert.equal(visibleCards.length, 10);
+  assert.equal(visibleCards.every(card => card.id.startsWith("fortune-") && card.dataset.seasons === "c7ms"), true);
+
+  app.document.getElementById("seasonFilter").value = "c7s4";
+  app.evaluate("applyFilters()");
+  assert.equal(app.document.querySelectorAll(".sprite-card").every(card => card.hidden), true);
+
+  app.document.getElementById("seasonFilter").value = "c7ms";
+  search.value = "sweet dreams";
+  app.evaluate("applyFilters()");
+  visibleCards = app.document.querySelectorAll(".sprite-card").filter(card => !card.hidden);
+  assert.deepEqual(visibleCards.map(card => [card.id, card.dataset.name]), [["sweet-dreams-sprite", "Sweet Dreams"]]);
 });

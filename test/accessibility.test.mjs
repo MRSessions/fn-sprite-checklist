@@ -15,6 +15,8 @@ test("documents pointer and keyboard state controls in a visible key", () => {
 
 test("exposes all three sprite states with tri-state checkbox semantics", async () => {
   const app = createApp();
+  app.document.getElementById("seasonFilter").value = "c7s3";
+  app.evaluate("applyFilters()");
   const card = app.card("water-sprite");
 
   assert.equal(card.getAttribute("role"), "checkbox");
@@ -37,6 +39,8 @@ test("exposes all three sprite states with tri-state checkbox semantics", async 
 
 test("number shortcuts update the accessible state directly", async () => {
   const app = createApp();
+  app.document.getElementById("seasonFilter").value = "c7s3";
+  app.evaluate("applyFilters()");
   const card = app.card("water-sprite");
 
   await card.dispatch("keydown", { key: "3" });

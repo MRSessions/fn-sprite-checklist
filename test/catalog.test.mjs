@@ -5,16 +5,44 @@ import test from "node:test";
 
 import { createApp } from "./app-harness.mjs";
 
-test("matches the 279 released sprites and their Fortnite seasons", () => {
+test("matches the 301 released sprites across their three Fortnite seasons", () => {
   const app = createApp();
   const catalog = JSON.parse(JSON.stringify(
     app.evaluate("sprites.map(({ id, name, src, seasons }) => ({ id, name, src, seasons }))")
   ));
 
-  assert.equal(catalog.length, 279);
-  assert.equal(new Set(catalog.map(sprite => sprite.id)).size, 279);
+  assert.equal(catalog.length, 301);
+  assert.equal(new Set(catalog.map(sprite => sprite.id)).size, 301);
+  assert.equal(catalog.filter(sprite => sprite.seasons.includes("c7ms")).length, 22);
   assert.equal(catalog.filter(sprite => sprite.seasons.includes("c7s4")).length, 162);
   assert.equal(catalog.filter(sprite => sprite.seasons.includes("c7s3")).length, 117);
+  assert.deepEqual(
+    catalog.filter(sprite => sprite.seasons.includes("c7ms")).map(({ id, name }) => ({ id, name })),
+    [
+      { id: "halfpeel-d-sprite", name: "Halfpeel'd" },
+      { id: "fortune-halfpeel-d-sprite", name: "Fortune Halfpeel'd" },
+      { id: "re-pete-sprite", name: "Re-Pete" },
+      { id: "fortune-re-pete-sprite", name: "Fortune Re-Pete" },
+      { id: "barry-o-fish-sprite", name: "Barry O'Fish" },
+      { id: "fortune-barry-o-fish-sprite", name: "Fortune Barry O'Fish" },
+      { id: "chester-sprite", name: "Chester" },
+      { id: "fortune-chester-sprite", name: "Fortune Chester" },
+      { id: "exmarks-sprite", name: "Exmarks" },
+      { id: "fortune-exmarks-sprite", name: "Fortune Exmarks" },
+      { id: "wayfinder-sprite", name: "Wayfinder" },
+      { id: "fortune-wayfinder-sprite", name: "Fortune Wayfinder" },
+      { id: "kelper-sprite", name: "Kelper" },
+      { id: "fortune-kelper-sprite", name: "Fortune Kelper" },
+      { id: "sweet-dreams-sprite", name: "Sweet Dreams" },
+      { id: "lil-squibbly-sprite", name: "Lil' Squibbly" },
+      { id: "fortune-lil-squibbly-sprite", name: "Fortune Lil' Squibbly" },
+      { id: "lil-flacko-sprite", name: "Lil' Flacko" },
+      { id: "fortune-lil-flacko-sprite", name: "Fortune Lil' Flacko" },
+      { id: "plundarrgh-sprite", name: "Plundarrgh" },
+      { id: "fortune-plundarrgh-sprite", name: "Fortune Plundarrgh" },
+      { id: "transponder-snail-sprite", name: "Transponder Snail" }
+    ]
+  );
   assert.deepEqual(
     catalog.filter(sprite => sprite.seasons.includes("c7s4")).map(sprite => sprite.name),
     [
@@ -106,7 +134,7 @@ test("includes exactly the 26 released Trick or Treat sprites", () => {
   assert.equal(trickOrTreatSprites.every(sprite => sprite.seasons.length === 1 && sprite.seasons[0] === "c7s4"), true);
 });
 
-test("includes exactly the five released current-season Quack sprites", () => {
+test("retains the five released Chapter 7 Season 4 Quack sprites", () => {
   const app = createApp();
   const currentQuackSprites = JSON.parse(JSON.stringify(
     app.evaluate('sprites.filter(sprite => sprite.name.startsWith("Quack ") && sprite.seasons.includes("c7s4")).map(({ id, name, seasons }) => ({ id, name, seasons }))')

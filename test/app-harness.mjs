@@ -227,7 +227,7 @@ class FakeStorage {
   }
 }
 
-function buildDocument() {
+function buildDocument(html) {
   const document = new FakeDocument();
   const ids = [
     "spriteGroups", "emptyResults", "status", "filterSummary", "collectedCount",
@@ -249,12 +249,15 @@ function buildDocument() {
   statusFilter.value = "all";
 
   const seasonFilter = document.getElementById("seasonFilter");
-  seasonFilter.options = [
-    ["c7s4", "Chapter 7 Season 4 (Current)"],
-    ["c7s3", "Chapter 7 Season 3"],
-    ["all", "All seasons"]
-  ].map(([value, textContent]) => ({ value, textContent }));
-  seasonFilter.value = "c7s4";
+  const seasonOptions = html.match(/<select\b[^>]*\bid="seasonFilter"[^>]*>([\s\S]*?)<\/select>/)?.[1];
+  if (!seasonOptions) throw new Error("Season selector not found");
+  seasonFilter.options = [...seasonOptions.matchAll(/<option\b([^>]*)>([^<]*)<\/option>/g)]
+    .map(([, attributes, textContent]) => ({
+      value: attributes.match(/\bvalue="([^"]*)"/)?.[1] || "",
+      textContent,
+      selected: /(?:^|\s)selected(?:\s|=|$)/.test(attributes)
+    }));
+  seasonFilter.value = (seasonFilter.options.find(option => option.selected) || seasonFilter.options[0]).value;
 
   for (const status of ["collected", "mastered", "not-found", "collected"]) {
     const button = new FakeElement(document, "button");
@@ -269,7 +272,7 @@ export function createApp({ storage = {}, confirm = () => true } = {}) {
   const script = html.match(/<script>([\s\S]*?)<\/script>/)?.[1];
   if (!script) throw new Error("Application script not found");
 
-  const document = buildDocument();
+  const document = buildDocument(html);
   const windowListeners = new Map();
   const window = {
     addEventListener(type, listener) {
@@ -279,6 +282,7 @@ export function createApp({ storage = {}, confirm = () => true } = {}) {
     }
   };
   const localStorage = new FakeStorage(storage);
+  const exportedBlobs = [];
   let timerId = 0;
   const context = vm.createContext({
     document,
@@ -287,7 +291,10 @@ export function createApp({ storage = {}, confirm = () => true } = {}) {
     location: { hostname: "", pathname: "/" },
     confirm,
     Blob,
-    URL: { createObjectURL: () => "blob:test", revokeObjectURL: () => {} },
+    URL: {
+      createObjectURL(blob) { exportedBlobs.push(blob); return "blob:test"; },
+      revokeObjectURL: () => {}
+    },
     setTimeout(callback) { callback(); return ++timerId; },
     clearTimeout() {},
     console
@@ -298,6 +305,7 @@ export function createApp({ storage = {}, confirm = () => true } = {}) {
     context,
     document,
     localStorage,
+    exportedBlobs,
     evaluate(expression) {
       return vm.runInContext(expression, context);
     },

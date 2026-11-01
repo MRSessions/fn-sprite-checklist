@@ -872,7 +872,8 @@
         </div>
         <div class="season-select-wrap">
           <select id="seasonFilter" class="season-select" aria-label="Filter by season">
-            <option value="c7s4">Chapter 7 Season 4 (Current)</option>
+            <option value="c7ms">Chapter 7 Mini Season (Current)</option>
+            <option value="c7s4">Chapter 7 Season 4</option>
             <option value="c7s3">Chapter 7 Season 3</option>
             <option value="all">All seasons</option>
           </select>
@@ -950,7 +951,8 @@
     const FALLBACK_TRACKER_TARGET = "sprites.doomedgaming.com";
     const SAVE_VERSION = 3;
     const EAGER_IMAGE_COUNT = 2;
-    const CURRENT_SEASON_ID = "c7s4";
+    const CURRENT_SEASON_ID = "c7ms";
+    const SEASON_FOUR_ID = "c7s4";
     const PREVIOUS_SEASON_ID = "c7s3";
     const STATES = ["not-found", "found", "mastered"];
     const STATE_LABELS = {
@@ -964,6 +966,21 @@
       ["Gummy ", "gummy-"],
       ["Galaxy ", "galaxy-"]
     ];
+    const MINI_SEASON_FAMILIES = [
+      "Halfpeel'd",
+      "Re-Pete",
+      "Barry O'Fish",
+      "Chester",
+      "Exmarks",
+      "Wayfinder",
+      "Kelper",
+      "Sweet Dreams",
+      "Lil' Squibbly",
+      "Lil' Flacko",
+      "Plundarrgh",
+      "Transponder Snail"
+    ];
+    const MINI_SEASON_BASE_ONLY_FAMILIES = new Set(["Sweet Dreams", "Transponder Snail"]);
     const SEASON_FOUR_VARIANTS = [
       ["", ""],
       ["Gold ", "gold-"],
@@ -1202,6 +1219,21 @@
     };
 
     const sprites = [
+      ...MINI_SEASON_FAMILIES.flatMap(family => {
+        const familyVariants = MINI_SEASON_BASE_ONLY_FAMILIES.has(family)
+          ? [["", ""]]
+          : [["", ""], ["Fortune ", "fortune-"]];
+        return familyVariants.map(([prefix, filePrefix]) => {
+          const id = `${filePrefix}${slug(family)}-sprite`;
+          return {
+            id,
+            family,
+            name: `${prefix}${family}`,
+            src: `sprites/${id}.webp`,
+            seasons: [CURRENT_SEASON_ID]
+          };
+        });
+      }),
       ...SEASON_FOUR_FAMILIES.flatMap(family => {
         const base = slug(family);
         const familyVariants = SEASON_FOUR_BASE_ONLY_FAMILIES.has(family)
@@ -1222,7 +1254,7 @@
             family,
             name: `${prefix}${family} Sprite`,
             src: `sprites/${id}.webp`,
-            seasons: [CURRENT_SEASON_ID]
+            seasons: [SEASON_FOUR_ID]
           };
         });
       }),
@@ -1403,7 +1435,7 @@
     }
 
     function currentSeasonLabel() {
-      return seasonFilter?.selectedOptions?.[0]?.textContent || "Chapter 7 Season 4 (Current)";
+      return seasonFilter?.selectedOptions?.[0]?.textContent || "Chapter 7 Mini Season (Current)";
     }
 
     function cardMatchesSelectedSeason(card) {
